@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "server":"npx convex dev"
   },
   "dependencies": {
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "convex": "^1.15.0",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
