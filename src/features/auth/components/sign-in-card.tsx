@@ -6,23 +6,43 @@ import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { SignInFlow } from "../types";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react"
+import { TriangleAlert } from "lucide-react";
 interface SignInCardProps {
     setSignState: (state: SignInFlow) => void
 }
 
 export function SignInCard({ setSignState }: SignInCardProps) {
 
+    const { signIn } = useAuthActions();
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const { signIn } = useAuthActions();
-    function handleProviderISgn(provider: "github" | "google" | "wechat") {
+    const [pending, setPending] = useState(false)
+    const [error, setError] = useState("")
+
+    function handlePasswordSignIn(e: FormEvent<HTMLElement>) {
+        e.preventDefault()
+        setPending(true)
+        signIn("password", { email, password, flow: "signIn" })
+            .catch(() => {
+                setError("无效的邮箱或密码")
+            })
+            .finally(() => {
+                setPending(false)
+            })
+    }
+
+    function handleProviderSign(provider: "github" | "google" | "wechat") {
         if (provider == "wechat") {
             console.log("暂未实现微信登录");
             return
         }
-        signIn(provider)
+        setPending(true)
+        signIn(provider).finally(() => {
+            setPending(false)
+        })
+
     }
     return (
         <Card className="h-full w-full p-8">
@@ -34,23 +54,31 @@ export function SignInCard({ setSignState }: SignInCardProps) {
                     使用邮箱或其他账户登录
                 </CardDescription>
             </CardHeader>
+            {!!error && (
+                <div className="p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive" >
+                    <TriangleAlert className="size-4" />
+                    <p>
+                        {error}
+                    </p>
+                </div>
+            )}
             <CardContent className="px-0 pb-0 space-y-5">
-                <form className="space-y-2.5" action="">
-                    <Input onChange={(e) => { setEmail(e.target.value) }} type="email" placeholder="邮箱" required />
-                    <Input onChange={(e) => { setPassword(e.target.value) }} type="password" placeholder="密码" required />
-                    <Button type="submit" className="w-full" size={"lg"} disabled={false}>
+                <form className="space-y-2.5" action="" onSubmit={handlePasswordSignIn}>
+                    <Input disabled={pending} onChange={(e) => { setEmail(e.target.value) }} type="email" placeholder="邮箱" required />
+                    <Input disabled={pending} onChange={(e) => { setPassword(e.target.value) }} type="password" placeholder="密码" required />
+                    <Button disabled={pending} type="submit" className="w-full" size={"lg"}>
                         登录
                     </Button>
                 </form>
                 <Separator />
                 <div className="flex flex-col gap-y-2.5">
-                    <Button onClick={() => { handleProviderISgn("google") }} variant={"outline"} size={"lg"} className="w-full relative ">
+                    <Button disabled={pending} onClick={() => { handleProviderSign("google") }} variant={"outline"} size={"lg"} className="w-full relative ">
                         使用Google登录<FcGoogle className="absolute top-3 left-2.5 size-5"></FcGoogle>
                     </Button>
-                    <Button onClick={() => { handleProviderISgn("github") }} variant={"outline"} size={"lg"} className="w-full relative">
+                    <Button disabled={pending} onClick={() => { handleProviderSign("github") }} variant={"outline"} size={"lg"} className="w-full relative">
                         使用Github登录<FaGithub className="absolute top-3 left-2.5 size-5" />
                     </Button>
-                    <Button onClick={() => { handleProviderISgn("wechat") }} variant={"outline"} size={"lg"} className="w-full relative">
+                    <Button disabled={pending} onClick={() => { handleProviderSign("wechat") }} variant={"outline"} size={"lg"} className="w-full relative">
                         使用微信登录<IoLogoWechat className="absolute top-3 left-2.5 size-5" />
                     </Button>
                 </div>
