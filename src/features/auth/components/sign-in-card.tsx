@@ -7,7 +7,7 @@ import { FaGithub } from "react-icons/fa";
 import { IoLogoWechat } from "react-icons/io5";
 import { SignInFlow } from "../types";
 import { useState } from "react";
-
+import { useAuthActions } from "@convex-dev/auth/react"
 interface SignInCardProps {
     setSignState: (state: SignInFlow) => void
 }
@@ -16,7 +16,14 @@ export function SignInCard({ setSignState }: SignInCardProps) {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
+    const { signIn } = useAuthActions();
+    function handleProviderISgn(provider: "github" | "google" | "wechat") {
+        if (provider == "wechat") {
+            console.log("暂未实现微信登录");
+            return
+        }
+        signIn(provider)
+    }
     return (
         <Card className="h-full w-full p-8">
             <CardHeader className="px-0 pt-0">
@@ -37,13 +44,13 @@ export function SignInCard({ setSignState }: SignInCardProps) {
                 </form>
                 <Separator />
                 <div className="flex flex-col gap-y-2.5">
-                    <Button variant={"outline"} size={"lg"} className="w-full relative ">
+                    <Button onClick={() => { handleProviderISgn("google") }} variant={"outline"} size={"lg"} className="w-full relative ">
                         使用Google登录<FcGoogle className="absolute top-3 left-2.5 size-5"></FcGoogle>
                     </Button>
-                    <Button variant={"outline"} size={"lg"} className="w-full relative">
+                    <Button onClick={() => { handleProviderISgn("github") }} variant={"outline"} size={"lg"} className="w-full relative">
                         使用Github登录<FaGithub className="absolute top-3 left-2.5 size-5" />
                     </Button>
-                    <Button variant={"outline"} size={"lg"} className="w-full relative">
+                    <Button onClick={() => { handleProviderISgn("wechat") }} variant={"outline"} size={"lg"} className="w-full relative">
                         使用微信登录<IoLogoWechat className="absolute top-3 left-2.5 size-5" />
                     </Button>
                 </div>
