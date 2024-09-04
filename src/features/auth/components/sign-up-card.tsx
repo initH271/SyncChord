@@ -12,6 +12,7 @@ interface SignUpCardProps {
 
 export function SignUpCard({ setSignState }: SignUpCardProps) {
     const { signIn } = useAuthActions();
+    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPass, setConfirmPass] = useState("")
@@ -20,7 +21,7 @@ export function SignUpCard({ setSignState }: SignUpCardProps) {
 
     function handlePasswordSignUp(e: FormEvent<HTMLElement>) {
         e.preventDefault()
-        if(password.length<8){
+        if (password.length < 8) {
             setError("密码长度需要不小于8位")
             return
         }
@@ -29,7 +30,10 @@ export function SignUpCard({ setSignState }: SignUpCardProps) {
             return
         }
         setPending(true)
-        signIn("password", { email, password, flow: "signUp" })
+        signIn("password", {
+            name, email, password,
+            flow: "signUp"
+        })
             .catch(() => {
                 setError("无效的邮箱或密码")
             })
@@ -57,6 +61,7 @@ export function SignUpCard({ setSignState }: SignUpCardProps) {
             )}
             <CardContent className="px-0 pb-0 space-y-5">
                 <form className="space-y-2.5" action="" onSubmit={handlePasswordSignUp}>
+                    <Input disabled={pending} onChange={(e) => { setName(e.target.value) }} type="text" placeholder="昵称" required />
                     <Input disabled={pending} onChange={(e) => { setEmail(e.target.value) }} type="email" placeholder="邮箱" required />
                     <Input disabled={pending} onChange={(e) => { setPassword(e.target.value) }} type="password" placeholder="密码" required />
                     <Input disabled={pending} onChange={(e) => { setConfirmPass(e.target.value) }} type="password" placeholder="再次输入密码" required />

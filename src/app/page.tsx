@@ -1,19 +1,15 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import AuthScreen from "@/features/auth/components/auth-screen";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { UserButton } from "@/features/auth/components/user-button";
 
 export default function Home() {
 
-  const { signOut } = useAuthActions()
 
   return (
-    <main className="h-full min-h-full flex flex-col items-center justify-center">
+    <main className="h-full min-h-full flex items-center justify-center">
       已经登录
-      <Button onClick={() => { signOut() }}>
-        退出登录
-      </Button>
+      <UserButton />
+
     </main>
   );
 }
