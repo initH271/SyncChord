@@ -4,9 +4,10 @@ import { v } from "convex/values";
 const schema = defineSchema({
     ...authTables,
     // Your other tables...
-    tasks: defineTable({
-        isCompleted: v.boolean(),
-        text: v.string(),
+    workspaces: defineTable({
+        name: v.string(),
+        joinCode: v.string(),
+        userId: v.id("users"), // 外键users表_id
     }),
 });
 
