@@ -10,11 +10,12 @@ interface WorkSpaceIdLayoutProps {
 
 export default function WorkSpaceIdLayout({ children }: WorkSpaceIdLayoutProps) {
     return (
-        <div className="h-full">
+        <div className="h-full bg-[#f3f0ed]">
             <Toolbar />
-            <div className="h-[calc(100vh-40px)] flex">
+            <div className="h-[calc(100vh-40px)] flex ">
                 <Sidebar />
                 {children}
+
             </div>
         </div>
     )

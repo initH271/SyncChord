@@ -17,7 +17,7 @@ export function UserButton() {
     const { signOut } = useAuthActions()
 
     if (isLoading) {
-        return <Loader className="size-10 animate-spin text-muted-foreground" />
+        return <Loader className="h-10 animate-spin text-muted-foreground" />
     }
     if (data == null) {
         return null

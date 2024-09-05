@@ -1,9 +1,10 @@
+import LoadingProgress from "@/components/loading-progress"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { useGetWorkspace } from "@/features/workspaces/api/use-get-workspace"
 import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces"
 import { useCreateWorkspaceModal } from "@/features/workspaces/store/use-create-workspace-modal"
 import { useWorkspaceId } from "@/hooks/use-workspace-id"
-import { LoaderCircle, Plus } from "lucide-react"
+import { Loader, LoaderCircle, Plus } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export const WorkspaceSwitcher = () => {
@@ -12,17 +13,15 @@ export const WorkspaceSwitcher = () => {
     const { data: workspace, isLoading: workspaceLoading } = useGetWorkspace({ id: workspaceId })
     const { data: workspaces, isLoading: workspacesLoading } = useGetWorkspaces()
     const [_open, setOpen] = useCreateWorkspaceModal()
-    const filterWorkspaces = workspaces!.filter((ws) => ws._id !== workspaceId)
+    const filterWorkspaces = workspaces?.filter((ws) => ws._id !== workspaceId)
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-                {
-                    workspaceLoading ? <LoaderCircle />
-                        : (<div className="size-10 rounded-sm relative flex justify-center items-center overflow-hidden bg-[#7a7ab4] hover:bg-[#3b3b89]  font-semibold text-xl text-white">
-                            {workspace?.name.charAt(0).toUpperCase()}
-                        </div>)
-                }
+                {workspaceLoading ? <Loader className="h-10 animate-spin text-muted-foreground" />
+                    : <div className="size-10 rounded-sm relative flex justify-center items-center overflow-hidden  font-semibold text-xl bg-[#bfbaaf] text-black px-4 border-[1px] hover:bg-[#b4965813]">
+                        {workspace?.name.charAt(0).toUpperCase()}
+                    </div>}
             </DropdownMenuTrigger>
             <DropdownMenuContent side="right" align="start" className="w-64">
                 <DropdownMenuItem className="flex-col cursor-pointer justify-start items-start capitalize">
@@ -33,7 +32,7 @@ export const WorkspaceSwitcher = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {
-                    workspacesLoading ? <LoaderCircle className="cursor-pointer justify-start items-center capitalize font-semibold flex" /> : filterWorkspaces.map((ws) =>
+                    workspacesLoading ? <LoaderCircle className="cursor-pointer justify-start items-center capitalize font-semibold flex" /> : filterWorkspaces?.map((ws) =>
                     (
                         <DropdownMenuItem
                             key={ws._id}
