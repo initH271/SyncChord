@@ -6,9 +6,24 @@ import { v } from "convex/values";
 export const get = query({
     args: {},
     handler: async (ctx) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
         return await ctx.db.query("workspaces").collect();
     },
 });
+
+// API: 获取workspace by id
+export const getById = query({
+    args: {
+        id: v.id("workspaces")
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+
+        return await ctx.db.get(args.id)
+    }
+})
 
 // API: 创建workspace
 export const create = mutation({

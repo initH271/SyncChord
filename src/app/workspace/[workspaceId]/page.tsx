@@ -1,14 +1,24 @@
+"use client"
+import { useGetWorkspace } from "@/features/workspaces/api/use-get-workspace"
+import { useWorkspaceId } from "@/hooks/use-workspace-id"
+import { Loader } from "lucide-react"
+
 interface WorkspaceIdPageProps {
-    params: {
-        workspaceId: string
-    }
+
 }
 
-export default function WorkSpaceIdPage({ params }: WorkspaceIdPageProps) {
-    
+export default function WorkSpaceIdPage(props: WorkspaceIdPageProps) {
+    const workspaceId = useWorkspaceId()
+    const { data, isLoading } = useGetWorkspace({ id: workspaceId })
+    if (isLoading) {
+        return (
+            <Loader className="size-4" />
+        )
+    }
+    const { name, joinCode } = data!
     return (
         <div>
-            欢迎来到工作空间 {params.workspaceId}
+            欢迎来到工作空间 {name}
         </div>
     )
 }
