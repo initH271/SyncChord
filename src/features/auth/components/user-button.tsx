@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useCurrentUser } from "../api/use-current-user"
 import { Loader, LogOut } from "lucide-react"
 import { useAuthActions } from "@convex-dev/auth/react"
-import { Button } from "@/components/ui/button"
 
 
 export function UserButton() {
@@ -18,7 +17,7 @@ export function UserButton() {
     const { signOut } = useAuthActions()
 
     if (isLoading) {
-        return <Loader className="size-4 animate-spin text-muted-foreground" />
+        return <Loader className="size-10 animate-spin text-muted-foreground" />
     }
     if (data == null) {
         return null
