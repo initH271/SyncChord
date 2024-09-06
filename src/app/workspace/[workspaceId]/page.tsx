@@ -10,15 +10,15 @@ interface WorkspaceIdPageProps {
 export default function WorkSpaceIdPage(props: WorkspaceIdPageProps) {
     const workspaceId = useWorkspaceId()
     const { data, isLoading } = useGetWorkspace({ id: workspaceId })
+
     if (isLoading) {
         return (
             <Loader className="size-4" />
         )
     }
-    const { name, joinCode } = data!
     return (
         <div>
-            欢迎来到工作空间 {name}
+            欢迎来到工作空间 {data?.name}
         </div>
     )
 }

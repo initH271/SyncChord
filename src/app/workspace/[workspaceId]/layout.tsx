@@ -9,6 +9,7 @@ interface WorkSpaceIdLayoutProps {
 
 
 export default function WorkSpaceIdLayout({ children }: WorkSpaceIdLayoutProps) {
+    
     return (
         <div className="h-full bg-[#f3f0ed]">
             <Toolbar />

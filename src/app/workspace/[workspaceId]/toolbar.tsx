@@ -1,14 +1,21 @@
+"use client"
 import LoadingProgress from "@/components/loading-progress"
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { useGetWorkspace } from "@/features/workspaces/api/use-get-workspace"
-import { useProgressTimer } from "@/hooks/use-progress-timer"
 import { useWorkspaceId } from "@/hooks/use-workspace-id"
-import { Loader, Search, Info, Loader2 } from "lucide-react"
+import { Search, Info } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export const Toolbar = () => {
+    const router = useRouter()
     const workspaceId = useWorkspaceId()
     const { data, isLoading } = useGetWorkspace({ id: workspaceId })
+    useEffect(() => {
+        if (!isLoading && data === null) {
+            router.push("/")
+        }
+    }, [data, router, isLoading])
     if (isLoading) {
         return (
             <div className="bg-[#fdfcfa] flex items-center justify-center h-10 p-1.5 border-solid border-b-[1px] border-[#e5e7eb]">
@@ -17,7 +24,8 @@ export const Toolbar = () => {
             </div>
         )
     }
-    const { name } = data!
+
+
     return (
         <nav className="bg-[#fdfcfa] flex items-center justify-center h-10 p-1.5 border-solid border-b-[1px] border-[#e5e7eb]">
             <div className="flex-1">
@@ -27,7 +35,7 @@ export const Toolbar = () => {
                 <Button className="bg-transparent hover:bg-[#f0eeeb] w-full justify-start h-7 px-2 border-[1px] border-black" size={"sm"}>
                     <Search className="size-4 text-black mr-2 " />
                     <span className="text-black/100 text-xs">
-                        在 {name} 中搜索
+                        在 {data?.name} 中搜索
                     </span>
                 </Button>
             </div>
