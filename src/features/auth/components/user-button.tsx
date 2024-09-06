@@ -37,7 +37,9 @@ export function UserButton() {
             <DropdownMenuContent align="start" side="right" className="w-60">
                 <DropdownMenuLabel>{name} 的账户</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { signOut(); router.push("/"); }}>
+                <DropdownMenuItem onClick={() => {
+                    signOut().finally(()=>router.push("/"))
+                }}>
                     <LogOut className="mr-2 size-4" /> 退出登录
                 </DropdownMenuItem>
             </DropdownMenuContent>
