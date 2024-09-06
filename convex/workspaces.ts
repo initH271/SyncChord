@@ -7,8 +7,18 @@ export const get = query({
     args: {},
     handler: async (ctx) => {
         const userId = await getAuthUserId(ctx)
-        if (!userId) throw new Error("未授权行为.");
-        return await ctx.db.query("workspaces").collect();
+        if (!userId) return [];
+
+        const members = await ctx.db.query("members")
+            .withIndex("by_user_id", (q) => q.eq("userId", userId))
+            .collect();
+        const workspaces = []
+        const workspaceIds = members.map(m => m.workspaceId);
+        for (const wsId of workspaceIds) {
+            const workspace = await ctx.db.get(wsId);
+            if (workspace) workspaces.push(workspace)
+        }
+        return workspaces
     },
 });
 
@@ -40,6 +50,13 @@ export const create = mutation({
             userId,
             joinCode
         })
+
+        await ctx.db.insert("members", {
+            userId,
+            workspaceId: wsId,
+            role: "admin"
+        })
+
         return wsId
     }
 })
