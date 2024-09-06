@@ -3,6 +3,7 @@
 import { Toolbar } from "./toolbar";
 import { Sidebar } from "./sidebar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import WorkSpaceSidebar from "./workspace-sidebar";
 
 interface WorkSpaceIdLayoutProps {
     children: React.ReactNode;
@@ -22,9 +23,7 @@ export default function WorkSpaceIdLayout({ children }: WorkSpaceIdLayoutProps) 
                 >
                     <ResizablePanel defaultSize={15} maxSize={20} minSize={15}
                         className="bg-[#fdfcfa]">
-                        <div>
-                            频道
-                        </div>
+                        <WorkSpaceSidebar />
                     </ResizablePanel>
                     <ResizableHandle withHandle />
 
