@@ -9,7 +9,7 @@ import { FaHome } from "react-icons/fa"
 export const Sidebar = () => {
     const pathname = usePathname()
     return (
-        <aside className="h-full bg-[#fdfcfa] flex flex-col w-[70px] gap-y-4 items-center pt-[9px] pb-4">
+        <aside className="h-full bg-[#fdfcfa] flex flex-col w-[70px] gap-y-4 items-center pt-[9px] pb-4 border-r-[1px] border-solid border-[#e5e7eb]">
             <WorkspaceSwitcher />
             <Separator />
             <SidebarButton icon={Home} label={"主页"} isActive={pathname.includes("/workspace")} />
