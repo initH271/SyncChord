@@ -73,3 +73,48 @@ export const create = mutation({
         return wsId
     }
 })
+
+// API: 修改workspace信息
+export const update = mutation({
+    args: {
+        id: v.id("workspaces"),
+        name: v.string(),
+    },
+    async handler(ctx, args) {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+        const member = await ctx.db.query("members")
+            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
+            .unique();
+        if (!member || member.role !== "admin") throw new Error("未授权行为");
+
+        await ctx.db.patch(args.id, {
+            name: args.name
+        })
+        return args.id
+    },
+})
+
+// API: 删除workspace
+export const remove = mutation({
+    args: {
+        id: v.id("workspaces"),
+    },
+    async handler(ctx, args) {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+        const member = await ctx.db.query("members")
+            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
+            .unique();
+        if (!member || member.role !== "admin") throw new Error("未授权行为");
+        // 物理删除 成员, 再删除空间
+        const [members] = await Promise.all([
+            ctx.db.query("members").withIndex("by_workspace_id", (q) => q.eq("workspaceId", args.id)).collect(),
+        ])
+        for (const m of members) {
+            await ctx.db.delete(m._id)
+        }
+        await ctx.db.delete(args.id)
+        return args.id
+    },
+})
