@@ -13,7 +13,7 @@ export const useProgressTimer = () => {
         }, 100);
 
         return () => clearTimeout(timer)
-    }, [])
+    }, [complete])
 
     return {
         progress, setComplete

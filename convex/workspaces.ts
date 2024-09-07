@@ -44,7 +44,6 @@ const generateJoinCode = (segLength: number, segCount: number) => {
     Array.from({ length: segCount }).forEach(() => {
         codes.push(Array.from({ length: 4 }, () => "0987654321qwertyuioplkjhgfdsazxcvbnm"[Math.floor(Math.random() * 36)]).join(""))
     })
-    console.log("codes:", codes);
     return codes.join("-")
 }
 
@@ -63,7 +62,10 @@ export const create = mutation({
             userId,
             joinCode
         })
-
+        await ctx.db.insert("channels",{
+            name:"general",
+            workspaceId: wsId,
+        })
         await ctx.db.insert("members", {
             userId,
             workspaceId: wsId,
