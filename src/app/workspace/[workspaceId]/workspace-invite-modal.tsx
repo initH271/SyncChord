@@ -33,7 +33,7 @@ export const InviteModal = ({open, setOpen, name, joinCode}: InviteModalProps) =
     }
 
     function handleCopy() {
-        const inviteUrl = `${window.location.origin}/join/${joinCode.toUpperCase()}`
+        const inviteUrl = `${window.location.origin}/join/${workspaceId}?joinCode=${joinCode.toUpperCase()}`
         navigator.clipboard.writeText(inviteUrl).then(_ => toast.success("邀请链接复制成功."))
     }
 

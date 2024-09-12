@@ -6,6 +6,7 @@ import { useGetWorkspaces } from "@/features/workspaces/api/use-get-workspaces";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import LoadingPage from "@/components/loading-page";
 
 export default function Home() {
 
@@ -35,8 +36,6 @@ export default function Home() {
   }, [isLoading, workspaceId])
 
   return (
-    <main className="h-full min-h-full flex items-center justify-center">
-      <Loader2 className="size-10 animate-spin" />
-    </main>
+    <LoadingPage />
   );
 }
