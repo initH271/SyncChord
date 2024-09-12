@@ -1,6 +1,6 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import {getAuthUserId} from "@convex-dev/auth/server";
+import {mutation, query} from "./_generated/server";
+import {v} from "convex/values";
 
 // API: 获取用户所有workspace
 export const get = query({
@@ -41,11 +41,31 @@ export const getById = query({
 // JoinCode生成 xxxx-xxxx-xxxx-xxxx
 const generateJoinCode = (segLength: number, segCount: number) => {
     const codes: string[] = []
-    Array.from({ length: segCount }).forEach(() => {
-        codes.push(Array.from({ length: 4 }, () => "0987654321qwertyuioplkjhgfdsazxcvbnm"[Math.floor(Math.random() * 36)]).join(""))
+    Array.from({length: segCount}).forEach(() => {
+        codes.push(Array.from({length: segLength}, () => "0987654321qwertyuioplkjhgfdsazxcvbnm"[Math.floor(Math.random() * 36)]).join(""))
     })
     return codes.join("-")
 }
+
+// API: 生成新的joinCode
+export const newJoinCode = mutation({
+    args: {
+        workspaceId: v.id("workspaces"),
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+        const member = await ctx.db.query("members")
+            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
+            .unique();
+        if (!member || member.role !== "admin") throw new Error("未授权行为");
+        const newCode = generateJoinCode(4, 4)
+        await ctx.db.patch(args.workspaceId, {
+            joinCode: newCode
+        })
+        return args.workspaceId
+    }
+})
 
 // API: 创建workspace
 export const create = mutation({
@@ -62,8 +82,8 @@ export const create = mutation({
             userId,
             joinCode
         })
-        await ctx.db.insert("channels",{
-            name:"general",
+        await ctx.db.insert("channels", {
+            name: "general",
             workspaceId: wsId,
         })
         await ctx.db.insert("members", {

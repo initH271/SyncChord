@@ -30,7 +30,7 @@ export default function PreferencesModal({ open, setOpen, initialValue }: Prefer
         e.preventDefault()
         const ok = await approval()
         if (!ok) return;
-        updateWorkspace({ id: workspaceId, name: newName }, {
+        await updateWorkspace({ id: workspaceId, name: newName }, {
             onSuccess() {
                 toast.success("修改成功")
                 setValue(newName)
@@ -44,7 +44,7 @@ export default function PreferencesModal({ open, setOpen, initialValue }: Prefer
     async function handleRemove() {
         const ok = await approval()
         if (!ok) return;
-        removeWorkspace({ id: workspaceId }, {
+        await removeWorkspace({ id: workspaceId }, {
             onSuccess() {
                 toast.success("删除成功")
                 router.replace("/")
