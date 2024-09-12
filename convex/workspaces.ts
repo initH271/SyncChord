@@ -22,6 +22,27 @@ export const get = query({
     },
 });
 
+// API: 获取workspace Info by id, 仅限用户作为成员所在的
+export const getInfoById = query({
+    args: {
+        id: v.id("workspaces")
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+        const workspace = await ctx.db.get(args.id)
+        if (!workspace) throw new Error("不存在的工作空间")
+        const member = await ctx.db.query("members")
+            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
+            .unique();
+
+        return {
+            name: workspace.name,
+            isMember: !!member,
+        }
+    }
+})
+
 // API: 获取workspace by id, 仅限用户作为成员所在的
 export const getById = query({
     args: {
@@ -38,13 +59,40 @@ export const getById = query({
     }
 })
 
+// API: 加入普通成员
+export const join = mutation({
+    args: {
+        workspaceId: v.id("workspaces"),
+        joinCode: v.string()
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+
+        const workspace = await ctx.db.get(args.workspaceId)
+        if (!workspace) throw new Error("不存在的工作空间")
+        if(args.joinCode.toLowerCase()!==workspace.joinCode) throw new Error("不存在的邀请码.")
+        const member = await ctx.db.query("members")
+            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
+            .unique();
+        if (!member) {
+            await ctx.db.insert("members", {
+                userId,
+                workspaceId: args.workspaceId,
+                role: "member"
+            })
+        }
+        return args.workspaceId
+    }
+})
+
 // JoinCode生成 xxxx-xxxx-xxxx-xxxx
-const generateJoinCode = (segLength: number, segCount: number) => {
+const generateJoinCode = (segLength: number = 4, segCount: number = 2) => {
     const codes: string[] = []
     Array.from({length: segCount}).forEach(() => {
         codes.push(Array.from({length: segLength}, () => "0987654321qwertyuioplkjhgfdsazxcvbnm"[Math.floor(Math.random() * 36)]).join(""))
     })
-    return codes.join("-")
+    return codes.join("")
 }
 
 // API: 生成新的joinCode
@@ -59,7 +107,7 @@ export const newJoinCode = mutation({
             .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
             .unique();
         if (!member || member.role !== "admin") throw new Error("未授权行为");
-        const newCode = generateJoinCode(4, 4)
+        const newCode = generateJoinCode()
         await ctx.db.patch(args.workspaceId, {
             joinCode: newCode
         })
@@ -76,7 +124,7 @@ export const create = mutation({
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为.");
 
-        const joinCode = generateJoinCode(4, 4)
+        const joinCode = generateJoinCode()
         const wsId = await ctx.db.insert("workspaces", {
             name: args.name,
             userId,

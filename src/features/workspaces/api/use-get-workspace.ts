@@ -10,3 +10,12 @@ export const useGetWorkspace = ({ id }: { id: Id<"workspaces"> }) => {
         data, isLoading
     }
 }
+
+export const useGetWorkspaceInfo = ({ id }: { id: Id<"workspaces"> }) => {
+    const data = useQuery(api.workspaces.getInfoById, { id })
+    const isLoading = data === undefined
+
+    return {
+        data, isLoading
+    }
+}
