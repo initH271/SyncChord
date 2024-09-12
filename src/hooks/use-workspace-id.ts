@@ -1,5 +1,5 @@
-import { useParams } from "next/navigation"
-import { Id } from "../../convex/_generated/dataModel"
+import {useParams} from "next/navigation"
+import {Id} from "../../convex/_generated/dataModel"
 
 // 获取路由参数workspaceId hook
 export const useWorkspaceId = () => {

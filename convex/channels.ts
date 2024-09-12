@@ -35,7 +35,7 @@ export const create = mutation({
 
         const chId = await ctx.db.insert("channels", {
             workspaceId: args.workspaceId,
-            name: args.name.replace(/\s+/g,"-")
+            name: args.name.replace(/\s+/g, "-")
         })
 
         return chId

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import {useEffect, useState} from "react"
 
 // 检查挂载hook
 export const useMounted = () => {
@@ -6,5 +6,5 @@ export const useMounted = () => {
     useEffect(() => {
         setMounted(true)
     }, [])
-    return { mounted }
+    return {mounted}
 }

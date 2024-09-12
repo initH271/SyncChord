@@ -1,4 +1,9 @@
-import { convexAuthNextjsMiddleware, createRouteMatcher, isAuthenticatedNextjs, nextjsMiddlewareRedirect } from "@convex-dev/auth/nextjs/server";
+import {
+    convexAuthNextjsMiddleware,
+    createRouteMatcher,
+    isAuthenticatedNextjs,
+    nextjsMiddlewareRedirect
+} from "@convex-dev/auth/nextjs/server";
 
 // 登录路由
 const isPublicPage = createRouteMatcher(["/auth", "/test/*"]);

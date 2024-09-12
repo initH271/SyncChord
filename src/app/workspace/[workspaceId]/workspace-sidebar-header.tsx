@@ -24,7 +24,7 @@ export default function WorkSpaceSidebarHeader({workspace, isAdmin}: WorkSpaceSi
     const [openInvite, setOpenInvite] = useState(false)
     return (
         <>
-            <InviteModal open={openInvite} setOpen={setOpenInvite} name={workspace.name} joinCode={workspace.joinCode} />
+            <InviteModal open={openInvite} setOpen={setOpenInvite} name={workspace.name} joinCode={workspace.joinCode}/>
             <PreferencesModal open={openPFM} setOpen={setOpenPFM} initialValue={workspace.name}/>
             <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
                 <DropdownMenu>

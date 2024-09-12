@@ -1,5 +1,5 @@
-import { query } from "./_generated/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import {query} from "./_generated/server";
+import {getAuthUserId} from "@convex-dev/auth/server";
 
 // 获取当前登录用户
 export const current = query({

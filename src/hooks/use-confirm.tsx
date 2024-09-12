@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader } from "@/components/ui/dialog"
-import { DialogTitle } from "@radix-ui/react-dialog"
-import { useState } from "react"
+import {Button} from "@/components/ui/button"
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader} from "@/components/ui/dialog"
+import {DialogTitle} from "@radix-ui/react-dialog"
+import {useState} from "react"
 
 export default function useApproval(title: string, message: string): [() => JSX.Element, () => Promise<unknown>] {
     const [promise, setPromise] = useState<{ resolve: (value: boolean) => void } | null>(null)
     const approval = () => new Promise((resolve, reject) => {
-        setPromise({ resolve })
+        setPromise({resolve})
     })
 
     const handleClose = () => {

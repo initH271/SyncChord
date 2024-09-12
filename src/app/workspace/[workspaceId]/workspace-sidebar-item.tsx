@@ -15,8 +15,8 @@ const sidebarItemVariants = cva(
                 active: "font-semibold bg-[#f0eeeb]"
             }
         },
-        defaultVariants:{
-            variant:"default"
+        defaultVariants: {
+            variant: "default"
         }
     }
 )
@@ -32,7 +32,7 @@ interface WorkspaceSidebarItemProps {
 export default function WorkspaceSidebarItem({id, icon: Icon, label, variant}: WorkspaceSidebarItemProps) {
     const workspaceId = useWorkspaceId()
     return (
-        <Button variant={"stone"} className={cn(sidebarItemVariants({variant}))} asChild >
+        <Button variant={"stone"} className={cn(sidebarItemVariants({variant}))} asChild>
             <Link href={`/workspaces/${workspaceId}/channel/${id}`}>
                 <Icon className={"size-5 shrink-0 mr-1"}/>
                 <span className={"text-sm truncate"}>{label}</span>

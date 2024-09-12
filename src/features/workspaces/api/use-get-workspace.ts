@@ -1,9 +1,9 @@
-import { useQuery } from "convex/react"
-import { api } from "../../../../convex/_generated/api"
-import { Id } from "../../../../convex/_generated/dataModel"
+import {useQuery} from "convex/react"
+import {api} from "../../../../convex/_generated/api"
+import {Id} from "../../../../convex/_generated/dataModel"
 
-export const useGetWorkspace = ({ id }: { id: Id<"workspaces"> }) => {
-    const data = useQuery(api.workspaces.getById, { id })
+export const useGetWorkspace = ({id}: { id: Id<"workspaces"> }) => {
+    const data = useQuery(api.workspaces.getById, {id})
     const isLoading = data === undefined
 
     return {
@@ -11,8 +11,8 @@ export const useGetWorkspace = ({ id }: { id: Id<"workspaces"> }) => {
     }
 }
 
-export const useGetWorkspaceInfo = ({ id }: { id: Id<"workspaces"> }) => {
-    const data = useQuery(api.workspaces.getInfoById, { id })
+export const useGetWorkspaceInfo = ({id}: { id: Id<"workspaces"> }) => {
+    const data = useQuery(api.workspaces.getInfoById, {id})
     const isLoading = data === undefined
 
     return {

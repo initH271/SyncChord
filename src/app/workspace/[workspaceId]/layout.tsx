@@ -1,8 +1,8 @@
 "use client"
 
-import { Toolbar } from "./toolbar";
-import { Sidebar } from "./sidebar";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {Toolbar} from "./toolbar";
+import {Sidebar} from "./sidebar";
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import WorkSpaceSidebar from "./workspace-sidebar";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {useGetWorkspace} from "@/features/workspaces/api/use-get-workspace";
@@ -13,7 +13,7 @@ interface WorkSpaceIdLayoutProps {
 }
 
 
-export default function WorkSpaceIdLayout({ children }: WorkSpaceIdLayoutProps) {
+export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
     const workspaceId = useWorkspaceId()
     const {isLoading} = useGetWorkspace({id: workspaceId})
 
@@ -24,18 +24,18 @@ export default function WorkSpaceIdLayout({ children }: WorkSpaceIdLayoutProps) 
     }
     return (
         <div className="h-full bg-[#f3f0ed]">
-            <Toolbar />
+            <Toolbar/>
             <div className="h-[calc(100vh-40px)] flex ">
-                <Sidebar />
+                <Sidebar/>
                 <ResizablePanelGroup
                     direction="horizontal"
                     autoSaveId={"channel-workspace-layout"}
                 >
                     <ResizablePanel defaultSize={15} maxSize={20} minSize={15}
-                        className="bg-[#fdfcfa]">
-                        <WorkSpaceSidebar />
+                                    className="bg-[#fdfcfa]">
+                        <WorkSpaceSidebar/>
                     </ResizablePanel>
-                    <ResizableHandle withHandle />
+                    <ResizableHandle withHandle/>
 
                     <ResizablePanel defaultSize={85} minSize={80} maxSize={85}>
                         {children}

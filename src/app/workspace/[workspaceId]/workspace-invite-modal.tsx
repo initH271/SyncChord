@@ -16,7 +16,7 @@ interface InviteModalProps {
 
 export const InviteModal = ({open, setOpen, name, joinCode}: InviteModalProps) => {
     const workspaceId = useWorkspaceId()
-    const {mutate, isPending} = useNewJoinCode()
+    const {mutate} = useNewJoinCode()
     const [ApprovalDialog, approval] = useApproval("要更新邀请码, 请点击确认?", "此操作将可能不可撤销!")
 
     async function handleNewCode() {
@@ -26,7 +26,7 @@ export const InviteModal = ({open, setOpen, name, joinCode}: InviteModalProps) =
             onSuccess: () => {
                 toast.success("新邀请码生成完毕.")
             },
-            onError: error => {
+            onError: () => {
                 toast.error("新邀请码生成失败.")
             }
         })

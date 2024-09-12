@@ -71,7 +71,7 @@ export const join = mutation({
 
         const workspace = await ctx.db.get(args.workspaceId)
         if (!workspace) throw new Error("不存在的工作空间")
-        if(args.joinCode.toLowerCase()!==workspace.joinCode) throw new Error("不存在的邀请码.")
+        if (args.joinCode.toLowerCase() !== workspace.joinCode) throw new Error("不存在的邀请码.")
         const member = await ctx.db.query("members")
             .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
             .unique();
