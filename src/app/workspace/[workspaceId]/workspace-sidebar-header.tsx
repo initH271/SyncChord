@@ -1,20 +1,31 @@
 import Hint from "@/components/hint";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronDown, ListFilter, SquarePen } from "lucide-react";
-import { Doc } from "../../../../convex/_generated/dataModel";
+import {Button} from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {ChevronDown, ListFilter, SquarePen} from "lucide-react";
+import {Doc} from "../../../../convex/_generated/dataModel";
 import PreferencesModal from "./preferences-modal";
-import { useState } from "react";
+import {useState} from "react";
+import {InviteModal} from "@/app/workspace/[workspaceId]/workspace-invite-modal";
 
 interface WorkSpaceSidebarHeaderProps {
     workspace: Doc<"workspaces">;
     isAdmin: boolean;
 }
-export default function WorkSpaceSidebarHeader({ workspace, isAdmin }: WorkSpaceSidebarHeaderProps) {
+
+export default function WorkSpaceSidebarHeader({workspace, isAdmin}: WorkSpaceSidebarHeaderProps) {
     const [openPFM, setOpenPFM] = useState(false)
+    const [openInvite, setOpenInvite] = useState(false)
     return (
         <>
-            <PreferencesModal open={openPFM} setOpen={setOpenPFM} initialValue={workspace.name} />
+            <InviteModal open={openInvite} setOpen={setOpenInvite} name={workspace.name} joinCode={workspace.joinCode} />
+            <PreferencesModal open={openPFM} setOpen={setOpenPFM} initialValue={workspace.name}/>
             <div className="flex items-center justify-between px-4 h-[49px] gap-0.5">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -24,10 +35,10 @@ export default function WorkSpaceSidebarHeader({ workspace, isAdmin }: WorkSpace
                             <span>
                                 {workspace.name}
                             </span>
-                            <ChevronDown className="size-4 ml-1 shrink-0" />
+                            <ChevronDown className="size-4 ml-1 shrink-0"/>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="start" className="w-64" >
+                    <DropdownMenuContent side="bottom" align="start" className="w-64">
                         <DropdownMenuLabel className="cursor-pointer capitalize">
                             <div className="flex flex-col items-start">
                                 <p className="font-bold">
@@ -40,14 +51,17 @@ export default function WorkSpaceSidebarHeader({ workspace, isAdmin }: WorkSpace
                         {
                             isAdmin && (
                                 <>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem onClick={() => {
+                                        setOpenInvite(true)
+                                    }} className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
                                         <div className="flex items-center gap-1">
                                             <i>邀请成员加入 {workspace.name}</i>
                                         </div>
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => setOpenPFM(true)} className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
+                                    <DropdownMenuSeparator/>
+                                    <DropdownMenuItem onClick={() => setOpenPFM(true)}
+                                                      className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
                                         <div className="flex items-center gap-1">
                                             选项
                                         </div>
@@ -60,12 +74,12 @@ export default function WorkSpaceSidebarHeader({ workspace, isAdmin }: WorkSpace
                 <div className="flex items-center gap-0.5">
                     <Hint side="bottom" align="center" label="筛选对话">
                         <Button variant="ghost" size={"icon"} className="text-black hover:bg-[#f0eeeb]">
-                            <ListFilter className="size-4" />
+                            <ListFilter className="size-4"/>
                         </Button>
                     </Hint>
                     <Hint side="bottom" align="center" label="发起新对话">
                         <Button variant="ghost" size={"icon"} className="text-black hover:bg-[#f0eeeb]">
-                            <SquarePen className="size-4" />
+                            <SquarePen className="size-4"/>
                         </Button>
                     </Hint>
                 </div>

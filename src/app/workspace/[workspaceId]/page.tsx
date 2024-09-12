@@ -17,8 +17,8 @@ export default function WorkSpaceIdPage(props: WorkspaceIdPageProps) {
         )
     }
     return (
-        <div>
-            欢迎来到工作空间 {data?.name}
+        <div className="flex h-full items-center justify-center bg-[#ffa ]">
+            {data?.name} 的聊天台
         </div>
     )
 }
