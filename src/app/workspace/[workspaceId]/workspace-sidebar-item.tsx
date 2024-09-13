@@ -33,7 +33,7 @@ export default function WorkspaceSidebarItem({id, icon: Icon, label, variant}: W
     const workspaceId = useWorkspaceId()
     return (
         <Button variant={"stone"} className={cn(sidebarItemVariants({variant}))} asChild>
-            <Link href={`/workspaces/${workspaceId}/channel/${id}`}>
+            <Link href={`/workspace/${workspaceId}/channel/${id}`}>
                 <Icon className={"size-5 shrink-0 mr-1"}/>
                 <span className={"text-sm truncate"}>{label}</span>
             </Link>

@@ -19,7 +19,7 @@ export default function WorkspaceSidebarSection({
     const [channelOn, toggle] = useToggle(true)
 
     return (<>
-        <div className={"flex flex-col px-2 w-full border border-x-0 border-b-0 rounded-md"}>
+        <div className={"flex flex-col px-2 pb-2 gap-y-0.5 w-full border border-x-0 border-b-0 rounded-md"}>
             <div className={"flex items-center pr-3.5 group"}>
                 <Button variant={"stone"} className={"p-0.5 text-sm shrink-0 size-6"}
                         onClick={toggle}>

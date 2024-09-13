@@ -25,6 +25,7 @@ export default function JoinPage() {
     }, [isMember, router, workspaceId]);
 
     async function handleJoin() {
+        if (code?.length !== 8) return;
         await mutate({
             workspaceId, joinCode: code!
         }, {
@@ -74,11 +75,14 @@ export default function JoinPage() {
                         autoFocus
                     />
                 </div>
-                <div className={"flex items-center justify-center gap-x-2"}>
+                <div className={"flex items-between justify-center gap-x-2"}>
                     <Button onClick={() => {
                         router.push("/")
                     }} variant={"default"}>
                         返回主页
+                    </Button>
+                    <Button disabled={code?.length !== 8} onClick={handleJoin} variant={"default"}>
+                        加入
                     </Button>
                 </div>
             </div>

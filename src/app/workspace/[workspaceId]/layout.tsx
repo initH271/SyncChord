@@ -7,6 +7,9 @@ import WorkSpaceSidebar from "./workspace-sidebar";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {useGetWorkspace} from "@/features/workspaces/api/use-get-workspace";
 import LoadingPage from "@/components/loading-page";
+import {useEffect} from "react";
+import {useRouter} from "next/navigation";
+import NoContentPage from "@/components/no-content-page";
 
 interface WorkSpaceIdLayoutProps {
     children: React.ReactNode;
@@ -15,12 +18,19 @@ interface WorkSpaceIdLayoutProps {
 
 export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
     const workspaceId = useWorkspaceId()
-    const {isLoading} = useGetWorkspace({id: workspaceId})
-
+    const {data, isLoading} = useGetWorkspace({id: workspaceId})
+    const router = useRouter()
+    useEffect(() => {
+        if (isLoading) return;
+        if (!data) router.push("/");
+    }, [isLoading, data, router]);
     if (isLoading) {
         return (
             <LoadingPage/>
         )
+    }
+    if (!data) {
+        return <NoContentPage content={"找不到正确的工作空间"}/>
     }
     return (
         <div className="h-full bg-[#f3f0ed]">

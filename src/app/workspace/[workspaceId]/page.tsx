@@ -2,23 +2,32 @@
 import {useGetWorkspace} from "@/features/workspaces/api/use-get-workspace"
 import {useWorkspaceId} from "@/hooks/use-workspace-id"
 import LoadingPage from "@/components/loading-page";
+import {useGetChannels} from "@/features/channels/api/use-get-channels";
+import {useEffect, useMemo} from "react";
+import {useRouter} from "next/navigation";
+import {useCreateChannelModal} from "@/features/channels/store/use-create-channel-modal";
 
 interface WorkspaceIdPageProps {
 
 }
 
-export default function WorkSpaceIdPage(props: WorkspaceIdPageProps) {
+export default function WorkSpaceIdPage({}: WorkspaceIdPageProps) {
     const workspaceId = useWorkspaceId()
-    const {data, isLoading} = useGetWorkspace({id: workspaceId})
+    const {data: workspace, isLoading: workspaceLoading} = useGetWorkspace({id: workspaceId})
+    const {data: channels, isLoading: channelsLoading} = useGetChannels({workspaceId})
+    const [_, setOpen] = useCreateChannelModal()
 
-    if (isLoading) {
-        return (
-            <LoadingPage/>
-        )
-    }
+    const firstChannelId = useMemo(() => channels?.[0]?._id, [channels])
+    const router = useRouter()
+    useEffect(() => {
+
+        if (workspaceLoading || channelsLoading || !workspace) return;
+
+        if (firstChannelId) router.replace(`/workspace/${workspaceId}/channel/${firstChannelId}`);
+        else setOpen(true);
+    }, [firstChannelId, router, workspaceId, workspaceLoading, channelsLoading, workspace, setOpen])
+
     return (
-        <div className="flex h-full items-center justify-center bg-[#ffa ]">
-            {data?.name} 的聊天台
-        </div>
+        <LoadingPage/>
     )
 }
