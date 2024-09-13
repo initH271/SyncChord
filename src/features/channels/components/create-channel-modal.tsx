@@ -36,7 +36,7 @@ export const CreateChannelModal = () => {
                 setOpen(false)
             },
             onError(error) {
-                console.error("创建channel: ", error);
+                console.error("创建channel失败: ", error);
             },
             onSettled() {
             }
