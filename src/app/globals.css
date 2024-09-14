@@ -80,3 +80,68 @@ body,
         @apply bg-background text-foreground;
     }
 }
+
+/*quill editor自定义样式*/
+.ql-toolbar {
+    /*工具栏样式*/
+    border: none !important;
+    background-color: #f8f8f8 !important;
+}
+
+.ql-toolbar .ql-formats:not(:last-child) {
+    /*工具栏 除最后一个控件, 都加上右边框*/
+    border-right: 1px solid #dcdcdc !important;
+    padding-right: 12px !important;
+}
+
+.ql-container {
+    /*容器 样式*/
+    border: none !important;
+    font-family: "lato", sans-serif !important;
+    height: unset !important;
+}
+
+.ql-editor {
+    /*编辑器 样式*/
+    line-height: 22px !important;
+    padding: 8px 12px !important;
+    color: #1d1c1d !important;
+    font-weight: 400;
+    font-family: "lato", sans-serif !important;
+    font-size: 14px !important;
+}
+
+.ql-editor a {
+    /*超链接内容 样式*/
+    color: #1264a3 !important;
+}
+
+.ql-editor a:hover {
+    text-decoration: underline !important;
+}
+
+.ql-renderer {
+    padding: 0 !important;
+}
+
+.ql-editor::before {
+    left: 12px !important;
+    font-family: "lato", sans-serif !important;
+    color: #8d8d8d !important;
+    font-style: normal !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    /*应用 tailwindcss*/
+    @apply truncate;
+}
+
+
+.ql-picker-item::before {
+    /*标题格式栏 字体*/
+    font-size: small !important;
+}
+
+.ql-picker.ql-expanded .ql-picker-options {
+    /*标题格式栏 位置移至上*/
+    top: -128px !important;
+}

@@ -84,7 +84,7 @@ export default function ChannelHeader({title}: ChannelHeader) {
                     <DialogContent>
                         <DialogHeader className="p-4 border-b">
                             <DialogTitle># {title}</DialogTitle>
-                            <DialogDescription className="text-sm pl-2">频道信息</DialogDescription>
+                            <DialogDescription className="text-sm pl-2">频道选项</DialogDescription>
                         </DialogHeader>
                         <div className="flex flex-col gap-y-2 px-4 pb-4">
                             <Dialog>
