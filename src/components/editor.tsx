@@ -8,6 +8,7 @@ import {MdSend} from "react-icons/md";
 import Hint from "@/components/hint";
 import {Delta, Op} from "quill/core";
 import {cn} from "@/lib/utils";
+import EmojiPopover from "@/components/emoji-popover";
 
 type EditorValue = {
     image: File | null;
@@ -122,6 +123,11 @@ export default function Editor({
         }
     }
 
+    function onSelectEmoji(emoji: any) {
+        const quill = quillRef.current
+        quill?.insertText(quill?.getSelection()?.index || 0, emoji.native)
+    }
+
     return (
         <div className="flex flex-col">
             <div
@@ -137,12 +143,12 @@ export default function Editor({
                                 : <PiTextTSlash className={"size-4"}/>}
                         </Button>
                     </Hint>
-                    <Hint label={"选择表情"} align={"center"} side={"top"}>
+                    <EmojiPopover onEmojiSelect={onSelectEmoji} hint={"选择emoji"}>
                         <Button disabled={disabled} size={"icon"} variant={"stone"}
                                 onClick={(e) => e.preventDefault()}>
                             <Smile className={"size-4"}/>
                         </Button>
-                    </Hint>
+                    </EmojiPopover>
                     {
                         variant === "update" && (
                             <div className="ml-auto flex items-center gap-x-2">
