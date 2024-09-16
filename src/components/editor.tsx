@@ -3,12 +3,13 @@ import {MutableRefObject, useEffect, useLayoutEffect, useRef, useState} from "re
 import Quill, {QuillOptions} from "quill";
 import {Button} from "@/components/ui/button";
 import {PiTextAa, PiTextTSlash} from "react-icons/pi";
-import {ImageIcon, Smile} from "lucide-react";
+import {ImageIcon, Smile, XIcon} from "lucide-react";
 import {MdSend} from "react-icons/md";
 import Hint from "@/components/hint";
 import {Delta, Op} from "quill/core";
 import {cn} from "@/lib/utils";
 import EmojiPopover from "@/components/emoji-popover";
+import Image from "next/image";
 
 type EditorValue = {
     image: File | null;
@@ -31,12 +32,15 @@ export default function Editor({
 }: EditorProps) {
     const [text, setText] = useState("")
     const [toolbarVisible, setToolbarVisible] = useState(true) // 工具栏可见
+    const [selectedImage, setSelectedImage] = useState<File | null>(null) // 已选择图片
 
     const submitRef = useRef(onSubmit)
     const placeholderRef = useRef(placeholder)
     const quillRef = useRef<Quill | null>(null)
     const defaultValueRef = useRef(defaultValue)
     const disabledRef = useRef(disabled)
+    const imageInputElemRef = useRef<HTMLInputElement | null>(null) // 提交图像元素
+
 
     const containerRef = useRef<HTMLDivElement>(null)
     useLayoutEffect(() => {
@@ -130,11 +134,36 @@ export default function Editor({
 
     return (
         <div className="flex flex-col">
+            <input type="file" accept="image/*" ref={imageInputElemRef} onChange={(e) => {
+                setSelectedImage(e.target.files![0]);
+            }}
+                   className={"hidden"}
+            />
             <div
                 className="flex flex-col border border-slate-200 rounded-md
                 transition
                 focus-within:border-slate-300 focus-within:shadow-sm bg-white">
                 <div ref={containerRef} className="h-full ql-custom"/>
+                {
+                    !!selectedImage && (
+                        <div className="p-2">
+                            <div className={"relative size-[62px] flex items-center justify-center group/image"}>
+                                <Hint side={"top"} align={"center"} label={"删除图片"}>
+                                    <button
+                                        className="hidden group-hover/image:flex rounded-full  bg-black/70 hover:bg-black absolute z-[4] -top-2.5 -right-2.5 text-white size-6 border-2 border-white items-center justify-center "
+                                        onClick={() => {
+                                            setSelectedImage(null);
+                                            imageInputElemRef.current!.value = "";
+                                        }}>
+                                        <XIcon className="size-3.5 "/>
+                                    </button>
+                                </Hint>
+                                <Image src={URL.createObjectURL(selectedImage)} alt={selectedImage.name} fill
+                                       className="rounded-xl overflow-hidden border object-cover"/>
+                            </div>
+                        </div>
+                    )
+                }
                 <div className="flex px-2 pb-2 z-[5] w-full border-b shadow-sm">
                     <Hint label={toolbarVisible ? "隐藏工具栏" : "显示工具栏"} align={"center"} side={"top"}>
                         <Button disabled={disabled} size={"icon"} variant={"stone"}
@@ -177,7 +206,11 @@ export default function Editor({
                             <Hint label={"选择图像"} align={"center"} side={"top"}>
                                 <Button disabled={disabled}
                                         size={"icon"} variant={"stone"}
-                                        onClick={(e) => e.preventDefault()}>
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            //
+                                            imageInputElemRef.current?.click();
+                                        }}>
                                     <ImageIcon className={"size-4"}/>
                                 </Button>
                             </Hint>
