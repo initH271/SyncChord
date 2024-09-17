@@ -25,6 +25,19 @@ const schema = defineSchema({
         workspaceId: v.id("workspaces"),
     })
         .index("by_workspace_id", ["workspaceId"]),
+    messages: defineTable(({
+        parentMessageId: v.optional(v.id("messages")),
+        workspaceId: v.id("workspaces"),
+        channelId: v.optional(v.id("channels")), // maybe conversation
+        memberId: v.id("members"),
+        updateAt: v.number(),
+        body: v.string(),
+        image: v.optional(v.id("_storage")),
+        // 私聊对话机制, maybe conversationId
+    }))
+    // 待建立索引
+    ,
+
 });
 
 export default schema;

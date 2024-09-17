@@ -13,7 +13,7 @@ import Image from "next/image";
 
 type EditorValue = {
     image: File | null;
-    body: string | Delta;
+    body: string;
 }
 
 interface EditorProps {
@@ -77,7 +77,7 @@ export default function Editor({
                                 const submittedImage = imageInputElemRef.current?.files?.[0] || null;
                                 if (!submittedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0) return;
                                 submitRef.current({
-                                    body: quill.getContents(),
+                                    body: JSON.stringify(quill.getContents()),
                                     image: submittedImage,
                                 })
                                 return;
@@ -207,7 +207,7 @@ export default function Editor({
                                             variant={"default"}
                                             onClick={() => {
                                                 onSubmit({
-                                                    body: quillRef.current?.getContents()!,
+                                                    body: JSON.stringify(quillRef.current!.getContents()),
                                                     // body: JSON.stringify(quillRef.current?.getContents()),
                                                     image: selectedImage,
                                                 })
@@ -239,7 +239,7 @@ export default function Editor({
                                     variant={"stone"}
                                     onClick={() => {
                                         onSubmit({
-                                            body: quillRef.current?.getContents()!,
+                                            body: JSON.stringify(quillRef.current!.getContents()),
                                             // body: JSON.stringify(quillRef.current?.getContents()),
                                             image: selectedImage,
                                         })
