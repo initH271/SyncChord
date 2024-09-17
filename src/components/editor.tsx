@@ -1,5 +1,5 @@
 import "quill/dist/quill.snow.css"
-import {MutableRefObject, useEffect, useLayoutEffect, useRef, useState} from "react";
+import {MutableRefObject, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import Quill, {QuillOptions} from "quill";
 import {Button} from "@/components/ui/button";
 import {PiTextAa, PiTextTSlash} from "react-icons/pi";
@@ -13,7 +13,7 @@ import Image from "next/image";
 
 type EditorValue = {
     image: File | null;
-    body: string;
+    body: string | Delta;
 }
 
 interface EditorProps {
@@ -63,7 +63,8 @@ export default function Editor({
                         enter: {
                             key: "Enter",
                             handler: function () {
-                                console.log("enter down")
+                                console.log("enter down event: insert new line")
+                                quill.insertText(quill.getSelection()?.index || 0, "\n")
                                 return; // return不为true时, 阻止handler的传播
                             }
                         },
@@ -71,7 +72,14 @@ export default function Editor({
                             key: "Enter",
                             ctrlKey: true,
                             handler: function () {
-                                console.log("ctrl+enter down")
+                                console.log("ctrl+enter down event: submit")
+                                const text = quill.getText();
+                                const submittedImage = imageInputElemRef.current?.files?.[0] || null;
+                                if (!submittedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0) return;
+                                submitRef.current({
+                                    body: quill.getContents(),
+                                    image: submittedImage,
+                                })
                                 return;
                             }
                         },
@@ -108,6 +116,8 @@ export default function Editor({
 //         editor.firstElementChild!.innerHTML = `<p>Hello World!</p>
 // <p>Some initial <strong>bold</strong> text</p>
 // <p>help: <a href="https://quilljs.com/docs/quickstart">quickstart</a></p>`
+        // TODO: 测试内容注意删除
+        editor.firstElementChild!.innerHTML = `<p>ak好好学</p>`
         return () => {
             quill.off(Quill.events.TEXT_CHANGE)
             if (container) container.innerHTML = "";
@@ -117,7 +127,8 @@ export default function Editor({
     }, [innerRef]);
 
     // 正则检测空内容
-    const isEmpty = text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0;
+    // const isEmpty = !selectedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0;
+    const isEmpty = useMemo(() => !selectedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0, [selectedImage, text]);
 
     function toggleToolbar() {
         setToolbarVisible((t) => !t)
@@ -185,7 +196,7 @@ export default function Editor({
                                     <Button disabled={disabled}
                                             size={"sm"}
                                             variant={"outline"}
-                                            onClick={(e) => e.preventDefault()}>
+                                            onClick={onCancel}>
                                         取消
                                     </Button>
                                 </Hint>
@@ -194,7 +205,13 @@ export default function Editor({
                                             size={"sm"}
                                             className="bg-[#007a5a] hover:bg-[#007a5a]/80 text-white"
                                             variant={"default"}
-                                            onClick={(e) => e.preventDefault()}>
+                                            onClick={() => {
+                                                onSubmit({
+                                                    body: quillRef.current?.getContents()!,
+                                                    // body: JSON.stringify(quillRef.current?.getContents()),
+                                                    image: selectedImage,
+                                                })
+                                            }}>
                                         保存
                                     </Button>
                                 </Hint>
@@ -220,7 +237,13 @@ export default function Editor({
                                     size={"icon"}
                                     disabled={disabled || isEmpty}
                                     variant={"stone"}
-                                    onClick={(e) => e.preventDefault()}>
+                                    onClick={() => {
+                                        onSubmit({
+                                            body: quillRef.current?.getContents()!,
+                                            // body: JSON.stringify(quillRef.current?.getContents()),
+                                            image: selectedImage,
+                                        })
+                                    }}>
                                     <MdSend className={"size-4"}/>
                                 </Button>
                             </Hint>
