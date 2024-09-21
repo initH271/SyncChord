@@ -145,3 +145,10 @@ body,
     /*标题格式栏 位置移至上*/
     top: -128px !important;
 }
+
+/*MessageList组件自定义样式*/
+.msgl-message-scrollbar {
+    @apply overflow-y-auto;
+    scrollbar-width: thin;
+    
+}

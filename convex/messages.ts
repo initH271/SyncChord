@@ -109,6 +109,10 @@ export const create = mutation({
     }
 })
 
+export type ReactionsWithCount = Doc<"reactions"> & {
+    count: number;
+    memberIds: Id<"members">[];
+}
 
 export const get = query({
     args: {
@@ -149,7 +153,7 @@ export const get = query({
 
                     const reactions = await populateReaction(ctx, message._id);
                     const thread = await populateThread(ctx, message._id);
-                    const image = message.image ? await ctx.storage.getUrl(message.image) : undefined;
+                    const image = message.image ? await ctx.storage.getUrl(message.image) || undefined : undefined;
 
                     // a: message
                     //      😔(10) 🙂(99)
@@ -164,10 +168,7 @@ export const get = query({
                             accumulator.push({...reaction, memberIds: [reaction.memberId], count: 1})
                         }
                         return accumulator;
-                    }, [] as (Doc<"reactions"> & {
-                        count: number;
-                        memberIds: Id<"members">[];
-                    })[]).map(({memberId, ...rest}) => rest);
+                    }, [] as ReactionsWithCount[]).map(({memberId, ...rest}) => rest);
                     return {
                         ...message,
                         image,
