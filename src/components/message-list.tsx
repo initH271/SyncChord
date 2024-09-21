@@ -1,6 +1,7 @@
 import {GetMessagesReturnType} from "@/features/messages/api/use-get-messages";
 import {differenceInMinutes, format, isToday, isYesterday} from "date-fns";
 import Message from "./message";
+import ChannelIntro from "@/components/channel-intro";
 
 interface MessageListProps {
     channelName?: string
@@ -85,6 +86,11 @@ export default function MessageList({
                         }
                     </div>
                 ))
+            }
+            {
+                variant === "channel" && channelName && channelCreationTime && (
+                    <ChannelIntro name={channelName} creationTime={channelCreationTime}/>
+                )
             }
         </div>
     );

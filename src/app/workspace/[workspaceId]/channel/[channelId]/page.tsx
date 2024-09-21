@@ -22,9 +22,8 @@ export default function ChannelIdPage() {
         return <NoContentPage content={"频道找不到"}/>
     }
     return (
-        <div className={"h-full flex flex-col"}>
+        <div className={"h-full flex flex-col bg-white"}>
             <ChannelHeader title={channel.name}/>
-
             <MessageList
                 channelName={channel.name}
                 channelCreationTime={channel._creationTime}
