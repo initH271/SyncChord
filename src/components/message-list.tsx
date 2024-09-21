@@ -1,5 +1,5 @@
 import {GetMessagesReturnType} from "@/features/messages/api/use-get-messages";
-import {format, isToday, isYesterday} from "date-fns";
+import {differenceInMinutes, format, isToday, isYesterday} from "date-fns";
 import Message from "./message";
 
 interface MessageListProps {
@@ -11,6 +11,8 @@ interface MessageListProps {
     canLoadMore: boolean,
     variant?: "channel",
 }
+
+const TIME_THRESHOLD = 3 // 消息间隔阈值
 
 const formatDateLabel = (dateString: string) => {
     const date = new Date(dateString)
@@ -53,29 +55,33 @@ export default function MessageList({
                             </span>
                         </div>
                         {
-                            messages!.map(message => (
-                                <Message
-                                    key={message._id}
-                                    id={message._id}
-                                    memberId={message.memberId}
-                                    authorImage={message.user.image}
-                                    authorName={message.user.name}
-                                    reactions={message.reactions}
-                                    body={message.body}
-                                    image={message.image}
-                                    updatedAt={message.updateAt}
-                                    createdAt={message._creationTime}
-                                    threadCount={message.thread.count}
-                                    threadImage={message.thread.image}
-                                    threadTimestamp={message.thread.timestamp}
+                            messages?.map((message, index) => {
+                                const prevMessage = messages[index - 1]
+                                const isCompact = prevMessage && prevMessage.memberId === message.memberId && differenceInMinutes(new Date(message._creationTime), new Date(prevMessage._creationTime)) < TIME_THRESHOLD;
+                                return (
+                                    <Message
+                                        key={message._id}
+                                        id={message._id}
+                                        memberId={message.memberId}
+                                        authorImage={message.user.image}
+                                        authorName={message.user.name}
+                                        reactions={message.reactions}
+                                        body={message.body}
+                                        image={message.image}
+                                        updatedAt={message.updateAt}
+                                        createdAt={message._creationTime}
+                                        threadCount={message.thread.count}
+                                        threadImage={message.thread.image}
+                                        threadTimestamp={message.thread.timestamp}
 
-                                    isAuthor={false}
-                                    isEditing={false}
-                                    setEditingId={() => {}}
-                                    isCompact={false}
-                                    hideThreadButton={false}
-                                />
-                            ))
+                                        isAuthor={false}
+                                        isEditing={false}
+                                        setEditingId={() => {}}
+                                        isCompact={isCompact}
+                                        hideThreadButton={false}
+                                    />
+                                )
+                            })
                         }
                     </div>
                 ))

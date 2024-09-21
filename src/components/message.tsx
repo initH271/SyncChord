@@ -65,7 +65,7 @@ export default function Message({
     return (
         <div className="flex flex-col gap-2 p-1.5 px-5 hover:bg-[#f3f0ed] group relative">
             <div className="flex items-start gap-2">
-                <button className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 w-[40px]
+                <button className="text-xs text-muted-foreground w-[40px]
                     leading-[22px] text-center hover:underline">
                     <Avatar className="size-7  hover:opacity-75 transition rounded-md">
                         <AvatarImage src={authorImage} className={"rounded-md"}/>
