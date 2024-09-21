@@ -1,7 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation, query, QueryCtx} from "./_generated/server";
 import {v} from "convex/values";
-import {Id} from "./_generated/dataModel";
+import {Doc, Id} from "./_generated/dataModel";
 import {paginationOptsValidator} from "convex/server";
 
 const populateUser = (ctx: QueryCtx, userId: Id<"users">) => {
@@ -30,7 +30,7 @@ const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
     }
     let lastMessage = messages[0]
     messages.forEach((message, i) => {
-        if (message.updateAt > lastMessage.updateAt) {
+        if (message._creationTime > lastMessage._creationTime) {
             lastMessage = message
         }
     })
@@ -94,6 +94,7 @@ export const create = mutation({
             if (!parentMessage) throw new Error("回复的消息不存在");
             _conversationId = parentMessage.conversationId
         }
+        if (image) {console.log("uploaded image id:", image)}
         return await ctx.db.insert("messages", {
             parentMessageId,
             workspaceId,
@@ -101,7 +102,7 @@ export const create = mutation({
             body,
             image,
             conversationId: _conversationId,
-            updateAt: Date.now(),
+            // updateAt: Date.now(),
             memberId: member._id,
         })
 
@@ -132,12 +133,51 @@ export const get = query({
             if (!parentMessage) throw new Error("回复的消息不存在");
             _conversationId = parentMessage.conversationId
         }
-        const results = ctx.db.query("messages").withIndex("by_channel_id_parent_message_id_conversation_id", q => q
+        const results = await ctx.db.query("messages").withIndex("by_channel_id_parent_message_id_conversation_id", q => q
             .eq("channelId", channelId)
             .eq("parentMessageId", parentMessageId)
             .eq("conversationId", _conversationId)
         ).order("desc").paginate(paginationOpts);
 
-        return results;
+        return {
+            ...results,
+            page: ( // 对message填充更详细的内容
+                await Promise.all(results.page.map(async (message) => {
+                    const member = await populateMember(ctx, message.memberId);
+                    const user = member ? await populateUser(ctx, member.userId) : null;
+                    if (!member || !user) return null;
+
+                    const reactions = await populateReaction(ctx, message._id);
+                    const thread = await populateThread(ctx, message._id);
+                    const image = message.image ? await ctx.storage.getUrl(message.image) : undefined;
+
+                    // a: message
+                    //      😔(10) 🙂(99)
+                    // reactions计数
+                    const reactionsWithCounts = reactions.reduce((accumulator, reaction) => {
+                        const existingReaction = accumulator.find(r => r.value === reaction.value); // 累加器里面找到已经存在的reaction
+                        if (existingReaction) {
+                            // 去重
+                            existingReaction.memberIds = Array.from(new Set([...existingReaction.memberIds, reaction.memberId]));
+                            existingReaction.count = existingReaction.memberIds.length
+                        } else {
+                            accumulator.push({...reaction, memberIds: [reaction.memberId], count: 1})
+                        }
+                        return accumulator;
+                    }, [] as (Doc<"reactions"> & {
+                        count: number;
+                        memberIds: Id<"members">[];
+                    })[]).map(({memberId, ...rest}) => rest);
+                    return {
+                        ...message,
+                        image,
+                        member,
+                        user,
+                        reactions: reactionsWithCounts,
+                        thread,
+                    }
+                }))
+            ).filter(message => message !== null)
+        };
     }
 })

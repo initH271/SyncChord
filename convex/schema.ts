@@ -30,7 +30,7 @@ const schema = defineSchema({
         workspaceId: v.id("workspaces"),
         channelId: v.optional(v.id("channels")), // maybe conversation
         memberId: v.id("members"),
-        updateAt: v.number(),
+        updateAt: v.optional(v.number()),
         body: v.string(),
         image: v.optional(v.id("_storage")),
         // 私聊对话机制, maybe conversationId
