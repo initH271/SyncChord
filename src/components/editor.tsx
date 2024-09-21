@@ -128,7 +128,7 @@ export default function Editor({
 
     // 正则检测空内容
     // const isEmpty = !selectedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0;
-    const isEmpty = useMemo(() => !selectedImage && text.trim().replace(/\s|<(.|\n)*?>/g, "").length === 0, [selectedImage, text]);
+    const isEmpty = useMemo(() => !selectedImage && text.trim().replace(/<(.|\n)*?>/g, "").length === 0, [selectedImage, text]);
 
     function toggleToolbar() {
         setToolbarVisible((t) => !t)
