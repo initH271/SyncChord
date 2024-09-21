@@ -116,8 +116,6 @@ export default function Editor({
 //         editor.firstElementChild!.innerHTML = `<p>Hello World!</p>
 // <p>Some initial <strong>bold</strong> text</p>
 // <p>help: <a href="https://quilljs.com/docs/quickstart">quickstart</a></p>`
-        // TODO: 测试内容注意删除
-        editor.firstElementChild!.innerHTML = `<p>ak好好学</p>`
         return () => {
             quill.off(Quill.events.TEXT_CHANGE)
             if (container) container.innerHTML = "";
