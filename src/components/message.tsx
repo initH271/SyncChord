@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import {format, isToday, isYesterday} from "date-fns";
 import Hint from "@/components/hint";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import Thumbnail from "@/components/thumbnail";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 
@@ -31,7 +32,7 @@ const formatFullTime = (date: Date) => {
 }
 
 export default function Message({
-    reactions, body,
+    reactions, body, image,
     createdAt, authorImage, authorName,
     isCompact, isEditing, updatedAt,
 }: MessageProps) {
@@ -52,6 +53,7 @@ export default function Message({
                     </Hint>
                     <div className="flex flex-col w-full">
                         <BodyRenderer value={body}/>
+                        <Thumbnail url={image}/>
                         {
                             updatedAt ? (
                                 <span className="text-xs text-muted-foreground">(已编辑)</span>
@@ -87,6 +89,7 @@ export default function Message({
                         </Hint>
                     </div>
                     <BodyRenderer value={body}/>
+                    <Thumbnail url={image}/>
                     {
                         updatedAt ? (
                             <span className="text-xs text-muted-foreground">(已编辑)</span>
