@@ -6,11 +6,13 @@ import LoadingPage from "@/components/loading-page";
 import NoContentPage from "@/components/no-content-page";
 import ChannelHeader from "@/app/workspace/[workspaceId]/channel/[channelId]/channel-header";
 import {ChatInput} from "@/app/workspace/[workspaceId]/channel/[channelId]/chat-input";
+import {useGetMessages} from "@/features/messages/api/use-get-messages";
 
 export default function ChannelIdPage() {
     const channelId = useChannelId()
     const {data: channel, isLoading: channelLoading} = useGetChannel({channelId})
-
+    const {results} = useGetMessages({channelId})
+    console.log("messages: ", results)
     if (channelLoading) {
         return <LoadingPage/>
     }
@@ -20,7 +22,11 @@ export default function ChannelIdPage() {
     return (
         <div className={"h-full flex flex-col"}>
             <ChannelHeader title={channel.name}/>
-            <div className="flex-1"></div>
+            <div className="flex-1">
+                {
+                    JSON.stringify(results)
+                }
+            </div>
             <ChatInput placeholder={`说些什么在 # ${channel.name}`}/>
         </div>
     )
