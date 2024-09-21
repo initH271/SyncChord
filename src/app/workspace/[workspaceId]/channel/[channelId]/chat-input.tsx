@@ -44,11 +44,11 @@ export function ChatInput({placeholder}: { placeholder: string }) {
                             if (!result.ok) throw new Error("图片上传失败");
                             const {storageId} = await result.json();
                             setStorageId(storageId)
+                            console.log("图片上传成功, id: ", storageId);
                         }
                     });
             }
-
-            await submitMessage({workspaceId, channelId, body, image: storageId ? storageId! : undefined}, {
+            await submitMessage({workspaceId, channelId, body, image: storageId ? storageId : undefined}, {
                 onSuccess: () => {
                     console.log("message submitted")
                 },
@@ -62,6 +62,7 @@ export function ChatInput({placeholder}: { placeholder: string }) {
         } finally {
             setEditorKey((k) => k + 1)
             editorRef.current?.enable(true)
+            setStorageId(null)
         }
     }
 
