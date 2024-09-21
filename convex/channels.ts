@@ -90,7 +90,7 @@ export const remove = mutation({
         const member = await ctx.db.query("members").withIndex("by_workspace_id_user_id",
             (q) => q.eq("workspaceId", workspaceId).eq("userId", userId)).unique();
         if (!member || "admin" !== member.role) throw new Error("未授权行为.");
-
+        // todo: 先移除channel关联的message
         await ctx.db.delete(channelId)
         return channelId
     }

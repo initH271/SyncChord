@@ -13,6 +13,7 @@ type RequestType = {
     parentMessageId?: Id<"messages">,
     workspaceId: Id<"workspaces">,
     channelId?: Id<"channels">,
+    conversationId?: Id<"conversations">,
     body: string,
     image?: Id<"_storage">,
 }

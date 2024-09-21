@@ -34,9 +34,29 @@ const schema = defineSchema({
         body: v.string(),
         image: v.optional(v.id("_storage")),
         // 私聊对话机制, maybe conversationId
+        conversationId: v.optional(v.id("conversations")),
     }))
-    // 待建立索引
-    ,
+        .index("by_workspace_id", ["workspaceId"])
+        .index("by_member_id", ["memberId"])
+        .index("by_channel_id", ["channelId"])
+        .index("by_channel_id_parent_message_id_conversation_id", [
+            "channelId", "parentMessageId", "conversationId"
+        ]),
+    conversations: defineTable({ // conversations table
+        workspaceId: v.id("workspaces"), // one to one in workspace
+        memberOneId: v.id("members"),
+        memberTwoId: v.id("members"),
+    })
+        .index("by_workspace_id", ["workspaceId"]),
+    reactions: defineTable({ /// reactions table
+        workspaceId: v.id("workspaces"),
+        memberId: v.id("members"),
+        messageId: v.id("messages"),
+        value: v.string(),
+    })
+        .index("by_workspace_id", ["workspaceId"])
+        .index("by_member_id", ["memberId"])
+        .index("by_message_id", ["messageId"]),
 
 });
 
