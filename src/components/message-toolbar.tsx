@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button";
-import {MessageSquareTextIcon, Smile, Trash} from "lucide-react";
+import {Edit2Icon, MessageSquareTextIcon, Smile, Trash} from "lucide-react";
 import Hint from "@/components/hint";
 import EmojiPopover from "@/components/emoji-popover";
 
@@ -30,20 +30,31 @@ export default function MessageToolbar({
             <div
                 className={"group-hover:opacity-100 opacity-0 transition-opacity border bg-white rounded-md  shadow-sm"}>
                 <EmojiPopover onEmojiSelect={handleReaction} hint={"添加reaction"}>
-                    <Button variant={"ghost"} size={"icon"} disabled={isPending} className={""}>
+                    <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}
+                            onClick={handleReaction}>
                         <Smile className={"size-4"}/>
                     </Button>
                 </EmojiPopover>
                 {!hideThreadButton &&
                     <Hint side={"top"} align={"center"} label={"回复该消息"}>
-                        <Button variant={"ghost"} size={"icon"} disabled={isPending} className={""}>
+                        <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}
+                                onClick={handleThread}>
                             <MessageSquareTextIcon className={"size-4"}/>
                         </Button>
                     </Hint>
                 }
                 {isAuthor &&
+                    <Hint side={"top"} align={"center"} label={"编辑"}>
+                        <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}
+                                onClick={handleEdit}>
+                            <Edit2Icon className={"size-4"}/>
+                        </Button>
+                    </Hint>
+                }
+                {isAuthor &&
                     <Hint side={"top"} align={"center"} label={"删除"}>
-                        <Button variant={"ghost"} size={"icon"} disabled={isPending} className={""}>
+                        <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}
+                                onClick={handleDelete}>
                             <Trash className={"size-4"}/>
                         </Button>
                     </Hint>
