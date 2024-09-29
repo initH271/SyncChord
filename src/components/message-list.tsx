@@ -5,6 +5,7 @@ import ChannelIntro from "@/components/channel-intro";
 import {useState} from "react";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {useCurrentMember} from "@/features/members/api/use-current-member";
+import {Loader} from "lucide-react";
 
 interface MessageListProps {
     channelName?: string
@@ -55,6 +56,18 @@ export default function MessageList({
     console.log("消息分组: ", groupedMessages)
     return (
         <div className="flex-1 flex flex-col-reverse pb-4 bg-[#fdfcfa]  msgl-message-scrollbar">
+            {canLoadMore && (
+                <div className="text-center my-2 relative">
+                    <hr className="absolute top-1/2 left-10 right-10 border-t border-gray-300"/>
+                    {isLoadingMore ? (<Loader className={"animate-spin"}/>) :
+                        (<button
+                            onClick={() => {loadMore()}}
+                            className="relative inline-block bg-white rounded-full text-sm px-4 py-1 border border-gray-300 shadow-sm">
+                            加载更多
+                        </button>)
+                    }
+                </div>
+            )}
             {
                 Object.entries(groupedMessages || {}).map(([dateKey, messages]) => (
                     <div key={dateKey}>

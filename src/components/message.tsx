@@ -32,7 +32,7 @@ interface MessageProps {
     threadTimestamp?: number,
     isEditing: boolean,
     isAuthor: boolean,
-    setEditingId?: (id: string | null) => void,
+    setEditingId?: (id: string) => void,
     isCompact?: boolean,
     hideThreadButton?: boolean
 }
@@ -59,7 +59,7 @@ export default function Message({
                 toast.error(`消息修改失败`)
             },
             onSettled: () => {
-                setEditingId!(null)
+                setEditingId!("")
             }
         })
     }
@@ -112,7 +112,7 @@ export default function Message({
                                     onSubmit={handleUpdate}
                                     disabled={updatingMessage}
                                     defaultValue={JSON.parse(body)}
-                                    onCancel={() => setEditingId!(null)}
+                                    onCancel={() => setEditingId!("")}
                                 />
                             </div>) :
                             (<div className="flex flex-col w-full">
@@ -162,7 +162,7 @@ export default function Message({
                                     onSubmit={handleUpdate}
                                     disabled={updatingMessage}
                                     defaultValue={JSON.parse(body)}
-                                    onCancel={() => setEditingId!(null)}
+                                    onCancel={() => setEditingId!("")}
                                 />
                             </div>) :
                             (<div className="flex flex-col w-full overflow-hidden">
