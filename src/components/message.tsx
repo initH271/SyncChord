@@ -4,6 +4,7 @@ import {format, isToday, isYesterday} from "date-fns";
 import Hint from "@/components/hint";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import Thumbnail from "@/components/thumbnail";
+import MessageToolbar from "@/components/message-toolbar";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 
@@ -28,13 +29,13 @@ interface MessageProps {
 }
 
 const formatFullTime = (date: Date) => {
-    return `${isToday(date) ? "今天" : isYesterday(date) ? "昨天" : format(date, "MM d, yyyy")} ${format(date, "kk:mm:ss")}`
+    return `${isToday(date) ? "今天" : isYesterday(date) ? "昨天" : format(date, "yyyy-MM-d ")} ${format(date, "kk:mm:ss")}`
 }
 
 export default function Message({
-    reactions, body, image,
+    reactions, body, image, id,
     createdAt, authorImage, authorName,
-    isCompact, isEditing, updatedAt,
+    isCompact, isEditing, updatedAt, isAuthor, setEditingId, hideThreadButton,
 }: MessageProps) {
     const createdDate = new Date(createdAt)
 
@@ -97,6 +98,17 @@ export default function Message({
                     }
                 </div>
             </div>
+            {
+                !isEditing && setEditingId && (
+                    <MessageToolbar isAuthor={isAuthor} isPending={false}
+                                    hideThreadButton={hideThreadButton}
+                                    handleEdit={() => setEditingId(id)}
+                                    handleThread={() => {}}
+                                    handleDelete={() => {}}
+                                    handleReaction={() => {}}/>
+
+                )
+            }
         </div>
     );
 }

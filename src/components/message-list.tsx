@@ -2,6 +2,9 @@ import {GetMessagesReturnType} from "@/features/messages/api/use-get-messages";
 import {differenceInMinutes, format, isToday, isYesterday} from "date-fns";
 import Message from "./message";
 import ChannelIntro from "@/components/channel-intro";
+import {useState} from "react";
+import {useWorkspaceId} from "@/hooks/use-workspace-id";
+import {useCurrentMember} from "@/features/members/api/use-current-member";
 
 interface MessageListProps {
     channelName?: string
@@ -10,7 +13,7 @@ interface MessageListProps {
     loadMore: () => void,
     isLoadingMore: boolean,
     canLoadMore: boolean,
-    variant?: "channel",
+    variant?: "channel" | "thread" | "conversation",
 }
 
 const TIME_THRESHOLD = 3 // 消息间隔阈值
@@ -32,6 +35,13 @@ export default function MessageList({
     canLoadMore,
     variant = "channel",
 }: MessageListProps) {
+    const [editingId, setEditingId] = useState("")
+
+    const workspaceId = useWorkspaceId()
+    const {data: currentMember, isLoading: loadingCurrentMember} = useCurrentMember({workspaceId})
+
+    if (loadingCurrentMember) return null;
+
     // 对消息按日期进行分组
     const groupedMessages = data!.reduce((groups, message) => {
         const date = new Date(message._creationTime);
@@ -71,15 +81,16 @@ export default function MessageList({
                                         image={message.image}
                                         updatedAt={message.updateAt}
                                         createdAt={message._creationTime}
+
                                         threadCount={message.thread.count}
                                         threadImage={message.thread.image}
                                         threadTimestamp={message.thread.timestamp}
 
-                                        isAuthor={false}
-                                        isEditing={false}
-                                        setEditingId={() => {}}
+                                        isAuthor={message.memberId === currentMember?._id}
+                                        isEditing={editingId === message._id}
+                                        setEditingId={setEditingId}
                                         isCompact={isCompact}
-                                        hideThreadButton={false}
+                                        hideThreadButton={variant === "thread"}
                                     />
                                 )
                             })
