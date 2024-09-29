@@ -11,6 +11,8 @@ import {Id} from "../../convex/_generated/dataModel";
 import {cn} from "@/lib/utils";
 import {useRemoveMessage} from "@/features/messages/api/use-remove-message";
 import useApproval from "@/hooks/use-confirm";
+import {useToggleReaction} from "@/features/reactions/api/use-toggle-reaction";
+import MessageReactions from "@/components/message-reactions";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 const Editor = dynamic(() => import("@/components/editor"), {ssr: false})
@@ -74,6 +76,18 @@ export default function Message({
             }
         })
     }
+    const {mutate: toggleReaction, isPending: togglingReaction} = useToggleReaction()
+    const handleReaction = async (value: string) => {
+        await toggleReaction({messageId: id, value}, {
+            onSuccess: data => {
+                toast.success("reaction done")
+            },
+            onError: error => {
+                toast.error("reaction failed")
+            }
+        })
+    }
+
     return (
         <>
             <ApprovalDialog/>
@@ -109,6 +123,7 @@ export default function Message({
                                         <span className="text-xs text-muted-foreground">(已编辑)</span>
                                     ) : null
                                 }
+                                <MessageReactions reactions={reactions} onChange={handleReaction}/>
                             </div>)}
                     </div>
                     {
@@ -118,7 +133,7 @@ export default function Message({
                                             handleEdit={() => setEditingId(id)}
                                             handleThread={() => {}}
                                             handleDelete={handleDelete}
-                                            handleReaction={() => {}}/>
+                                            handleReaction={handleReaction}/>
 
                         )
                     }
@@ -169,6 +184,7 @@ export default function Message({
                                         <span className="text-xs text-muted-foreground">(已编辑)</span>
                                     ) : null
                                 }
+                                <MessageReactions reactions={reactions} onChange={handleReaction}/>
                             </div>)}
                     </div>
                     {
@@ -178,7 +194,7 @@ export default function Message({
                                             handleEdit={() => setEditingId(id)}
                                             handleThread={() => {}}
                                             handleDelete={handleDelete}
-                                            handleReaction={() => {}}/>
+                                            handleReaction={handleReaction}/>
 
                         )
                     }

@@ -9,7 +9,7 @@ interface MessageToolbarProps {
     hideThreadButton?: boolean;
     handleDelete: () => void;
     handleEdit: () => void;
-    handleReaction: () => void;
+    handleReaction: (value: string) => void;
     handleThread: () => void;
 }
 
@@ -29,9 +29,8 @@ export default function MessageToolbar({
             {/*hover到消息组件时显示*/}
             <div
                 className={"group-hover:opacity-100 opacity-0 transition-opacity border bg-white rounded-md  shadow-sm"}>
-                <EmojiPopover onEmojiSelect={handleReaction} hint={"添加reaction"}>
-                    <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}
-                            onClick={handleReaction}>
+                <EmojiPopover onEmojiSelect={(emoji) => handleReaction(emoji.native)} hint={"添加reaction"}>
+                    <Button variant={"ghost"} size={"icon_sm"} disabled={isPending} className={""}>
                         <Smile className={"size-4"}/>
                     </Button>
                 </EmojiPopover>
