@@ -181,8 +181,7 @@ export default function Editor({
                         </Button>
                     </Hint>
                     <EmojiPopover onEmojiSelect={onSelectEmoji} hint={"选择emoji"}>
-                        <Button disabled={disabled} size={"icon"} variant={"stone"}
-                                onClick={(e) => e.preventDefault()}>
+                        <Button disabled={disabled} size={"icon"} variant={"stone"}>
                             <Smile className={"size-4"}/>
                         </Button>
                     </EmojiPopover>
