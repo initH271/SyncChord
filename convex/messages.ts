@@ -65,6 +65,8 @@ const getMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspac
     ).unique()
 }
 
+
+// 创建消息API
 export const create = mutation({
     args: {
         parentMessageId: v.optional(v.id("messages")),
@@ -102,6 +104,7 @@ export const create = mutation({
             body,
             image,
             conversationId: _conversationId,
+            isDeleted: false,
             // updateAt: Date.now(),
             memberId: member._id,
         })
@@ -114,6 +117,7 @@ export type ReactionsWithCount = Doc<"reactions"> & {
     memberIds: Id<"members">[];
 }
 
+// 查询消息API
 export const get = query({
     args: {
         parentMessageId: v.optional(v.id("messages")),
@@ -141,8 +145,7 @@ export const get = query({
             .eq("channelId", channelId)
             .eq("parentMessageId", parentMessageId)
             .eq("conversationId", _conversationId)
-        ).order("desc").paginate(paginationOpts);
-
+        ).filter(q => q.eq(q.field("isDeleted"), false)).order("desc").paginate(paginationOpts);
         return {
             ...results,
             page: ( // 对message填充更详细的内容
@@ -180,5 +183,49 @@ export const get = query({
                 }))
             ).filter(message => message !== null)
         };
+    }
+})
+
+// 修改消息API
+export const update = mutation({
+    args: {
+        id: v.id("messages"),
+        body: v.string(),
+    },
+    handler: async (ctx, {id, body}) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为");
+        const message = await ctx.db.get(id)
+        if (!message || message.isDeleted) throw new Error("消息不存在");
+
+        const member = await ctx.db.get(message.memberId)
+        if (!member || member._id !== message.memberId) throw new Error("未授权行为")
+        await ctx.db.patch(id, {
+            body,
+            updateAt: Date.now()
+        })
+        return id;
+    }
+})
+// 删除消息API
+export const remove = mutation({
+    args: {
+        id: v.id("messages"),
+    },
+    handler: async (ctx, {id}) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) throw new Error("未授权行为");
+        const message = await ctx.db.get(id)
+        if (!message) throw new Error("消息不存在");
+
+        const member = await ctx.db.get(message.memberId)
+        if (!member || member._id !== message.memberId) throw new Error("未授权行为")
+        // await ctx.db.delete(id)
+        // 更换软删除策略
+        await ctx.db.patch(id, {
+            isDeleted: true,
+            deletedAt: Date.now(),
+        })
+        return id;
     }
 })

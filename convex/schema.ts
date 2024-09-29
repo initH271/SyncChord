@@ -33,6 +33,8 @@ const schema = defineSchema({
         updateAt: v.optional(v.number()),
         body: v.string(),
         image: v.optional(v.id("_storage")),
+        isDeleted: v.boolean(),
+        deletedAt: v.optional(v.number()),
         // 私聊对话机制, maybe conversationId
         conversationId: v.optional(v.id("conversations")),
     }))
