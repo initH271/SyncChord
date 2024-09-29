@@ -17,28 +17,28 @@ interface EmojiPopoverProps {
 
 // 表情选择 弹窗组件
 export default function EmojiPopover({children, hint = " 表情", onEmojiSelect}: EmojiPopoverProps) {
-    const [popover, setPopover] = useState(false);
-    const [tooltip, setTooltip] = useState(false);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [tooltipOpen, setTooltipOpen] = useState(false);
 
     function onSelectEmoji(emoji: any) {
         onEmojiSelect(emoji)
-        setPopover(false)
+        setPopoverOpen(false)
+        setTimeout(() => {
+            setTooltipOpen(false)
+        }, 500)
     }
 
     return (
         <TooltipProvider>
-            <Popover open={popover} onOpenChange={setPopover}>
-                <Tooltip delayDuration={50} open={tooltip} onOpenChange={(open) => {
-                    setPopover(true);
-                    setTooltip(open);
-                }}>
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <Tooltip delayDuration={50} open={tooltipOpen} onOpenChange={setTooltipOpen}>
                     <PopoverTrigger asChild>
-                        <TooltipTrigger asChild>
-                            {children}
-                        </TooltipTrigger>
+                        <TooltipTrigger asChild>{children}</TooltipTrigger>
                     </PopoverTrigger>
-                    <TooltipContent side={"left"} align={"center"}
-                                    className="bg-black text-white border border-white/5">
+                    <TooltipContent
+                        side={"top"}
+                        align={"center"}
+                        className="bg-black text-white border border-white/5">
                         <p className="font-medium text-xs">{hint}</p>
                     </TooltipContent>
                 </Tooltip>
