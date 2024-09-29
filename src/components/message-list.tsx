@@ -2,10 +2,10 @@ import {GetMessagesReturnType} from "@/features/messages/api/use-get-messages";
 import {differenceInMinutes, format, isToday, isYesterday} from "date-fns";
 import Message from "./message";
 import ChannelIntro from "@/components/channel-intro";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {useCurrentMember} from "@/features/members/api/use-current-member";
-import {Loader} from "lucide-react";
+import {Loader, Loader2} from "lucide-react";
 
 interface MessageListProps {
     channelName?: string
@@ -111,11 +111,65 @@ export default function MessageList({
                     </div>
                 ))
             }
+            {/*<LoadMoreMessage canLoadMore={canLoadMore} loadMore={loadMore}/>*/}
+            {/*元素可见时加载更多*/}
+            <div className="h-1" ref={(el) => {
+                if (el) {
+                    const observer = new IntersectionObserver(
+                        ([entry]) => {
+                            if (entry.isIntersecting && canLoadMore) loadMore();
+                        },
+                        {threshold: 1.0}
+                    );
+                    observer.observe(el);
+                    return () => observer.disconnect();
+                }
+            }}/>
+            {isLoadingMore && (
+                <div className="text-center my-2 relative">
+                    {/*<hr className="absolute top-1/2 left-10 right-10 border-t border-gray-300"/>*/}
+                    <span
+                        className="relative inline-block bg-transparent rounded-full text-sm px-4 py-1 shadow-sm">
+                        <Loader2 className="animate-spin bg-transparent"/>
+                    </span>
+                </div>
+            )}
             {
                 variant === "channel" && channelName && channelCreationTime && (
                     <ChannelIntro name={channelName} creationTime={channelCreationTime}/>
                 )
             }
+
         </div>
     );
 }
+
+// 加载更多消息组件
+const LoadMoreMessage = ({canLoadMore, loadMore}: { canLoadMore: boolean, loadMore: () => void }) => {
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const divRef = useRef(null);
+
+    useEffect(() => {
+        if (divRef.current) {
+            observerRef.current = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting && canLoadMore) {
+                        loadMore();
+                    }
+                },
+                {threshold: 1.0}
+            );
+
+            observerRef.current.observe(divRef.current);
+        }
+
+        // 在组件卸载时断开观察器
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, [canLoadMore, loadMore]);
+
+    return <div className="h-1" ref={divRef}/>;
+};
