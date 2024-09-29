@@ -3,13 +3,24 @@ import {mutation, query, QueryCtx} from "./_generated/server";
 import {v} from "convex/values";
 import {Doc, Id} from "./_generated/dataModel";
 import {paginationOptsValidator} from "convex/server";
+import {getMember, populateMember, populateUser} from "./common";
 
-const populateUser = (ctx: QueryCtx, userId: Id<"users">) => {
-    return ctx.db.get(userId)
+/**
+ * 导出messages API相关参数类型
+ */
+
+/**
+ * reactions的扩展类型
+ */
+export type ReactionsWithCount = Doc<"reactions"> & {
+    count: number;
+    memberIds: Id<"members">[];
 }
-const populateMember = (ctx: QueryCtx, memberId: Id<"members">) => {
-    return ctx.db.get(memberId)
-}
+
+/**
+ * API辅助函数
+ */
+
 // 填充回应
 const populateReaction = (ctx: QueryCtx, messageId: Id<"messages">) => {
     return ctx.db.query("reactions").withIndex("by_message_id",
@@ -58,14 +69,6 @@ const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
 
 }
 
-
-const getMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspaces">) => {
-    return ctx.db.query("members").withIndex("by_workspace_id_user_id",
-        (q) => q.eq("workspaceId", workspaceId).eq("userId", userId)
-    ).unique()
-}
-
-
 // 创建消息API
 export const create = mutation({
     args: {
@@ -111,11 +114,6 @@ export const create = mutation({
 
     }
 })
-
-export type ReactionsWithCount = Doc<"reactions"> & {
-    count: number;
-    memberIds: Id<"members">[];
-}
 
 // 查询消息API
 export const get = query({
