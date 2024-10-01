@@ -183,7 +183,44 @@ export const get = query({
         };
     }
 })
+// 查询单条消息包含reactions API
+export const getById = query({
+    args: {
+        id: v.id("messages")
+    },
+    handler: async (ctx, {id}) => {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) return null;
+        const message = await ctx.db.get(id)
+        if (!message) return null;
+        const currentMember = await getMember(ctx, userId, message.workspaceId)
+        if (!currentMember) return null;
+        const member = await populateMember(ctx, message.memberId)
+        if (!member) return null;
+        const user = await populateUser(ctx, member.userId)
+        if (!user) return null;
+        const reactions = await populateReaction(ctx, id)
+        const reactionsWithCounts = reactions.reduce((accumulator, reaction) => {
+            const existingReaction = accumulator.find(r => r.value === reaction.value); // 累加器里面找到已经存在的reaction
+            if (existingReaction) {
+                // 去重
+                existingReaction.memberIds = Array.from(new Set([...existingReaction.memberIds, reaction.memberId]));
+                existingReaction.count = existingReaction.memberIds.length
+            } else {
+                accumulator.push({...reaction, memberIds: [reaction.memberId], count: 1})
+            }
+            return accumulator;
+        }, [] as ReactionsWithCount[]).map(({memberId, ...rest}) => rest);
 
+        return {
+            ...message,
+            image: message.image ? await ctx.storage.getUrl(message.image) : undefined,
+            user,
+            member,
+            reactions: reactionsWithCounts
+        }
+    }
+})
 // 修改消息API
 export const update = mutation({
     args: {
