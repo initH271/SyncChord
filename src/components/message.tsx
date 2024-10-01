@@ -13,6 +13,7 @@ import {useRemoveMessage} from "@/features/messages/api/use-remove-message";
 import useApproval from "@/hooks/use-confirm";
 import {useToggleReaction} from "@/features/reactions/api/use-toggle-reaction";
 import MessageReactions from "@/components/message-reactions";
+import {useRouter} from "next/navigation";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 const Editor = dynamic(() => import("@/components/editor"), {ssr: false})
@@ -87,7 +88,10 @@ export default function Message({
             }
         })
     }
-
+    const router = useRouter()
+    const handleThread = () => {
+        router.replace(`${window.location.pathname}?parentMessageId=${id}`)
+    }
     return (
         <>
             <ApprovalDialog/>
@@ -131,7 +135,7 @@ export default function Message({
                             <MessageToolbar isAuthor={isAuthor} isPending={false}
                                             hideThreadButton={hideThreadButton}
                                             handleEdit={() => setEditingId(id)}
-                                            handleThread={() => {}}
+                                            handleThread={handleThread}
                                             handleDelete={handleDelete}
                                             handleReaction={handleReaction}/>
 
@@ -192,7 +196,7 @@ export default function Message({
                             <MessageToolbar isAuthor={isAuthor} isPending={updatingMessage}
                                             hideThreadButton={hideThreadButton}
                                             handleEdit={() => setEditingId(id)}
-                                            handleThread={() => {}}
+                                            handleThread={handleThread}
                                             handleDelete={handleDelete}
                                             handleReaction={handleReaction}/>
 

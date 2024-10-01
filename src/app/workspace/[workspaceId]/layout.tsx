@@ -10,6 +10,7 @@ import LoadingPage from "@/components/loading-page";
 import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import NoContentPage from "@/components/no-content-page";
+import {usePanel} from "@/hooks/use-panel";
 
 interface WorkSpaceIdLayoutProps {
     children: React.ReactNode;
@@ -20,6 +21,8 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
     const workspaceId = useWorkspaceId()
     const {data, isLoading} = useGetWorkspace({id: workspaceId})
     const router = useRouter()
+    const {parentMessageId, onCloseMessage} = usePanel()
+    const showPanel = !!parentMessageId;
     useEffect(() => {
         if (isLoading) return;
         if (!data) router.push("/");
@@ -32,6 +35,7 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
     if (!data) {
         return <NoContentPage content={"找不到正确的工作空间"}/>
     }
+
     return (
         <div className="h-full bg-[#f3f0ed]">
             <Toolbar/>
@@ -47,9 +51,17 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
 
-                    <ResizablePanel defaultSize={85} minSize={80} maxSize={85}>
+                    <ResizablePanel defaultSize={85} minSize={50} maxSize={85}>
                         {children}
                     </ResizablePanel>
+                    {showPanel && (
+                        <>
+                            <ResizableHandle withHandle/>
+                            <ResizablePanel defaultSize={30} minSize={20}>
+                                对消息{parentMessageId}的主题讨论
+                            </ResizablePanel>
+                        </>
+                    )}
 
                 </ResizablePanelGroup>
             </div>
