@@ -13,7 +13,7 @@ import {useRemoveMessage} from "@/features/messages/api/use-remove-message";
 import useApproval from "@/hooks/use-confirm";
 import {useToggleReaction} from "@/features/reactions/api/use-toggle-reaction";
 import MessageReactions from "@/components/message-reactions";
-import {useRouter} from "next/navigation";
+import {usePanel} from "@/hooks/use-panel";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 const Editor = dynamic(() => import("@/components/editor"), {ssr: false})
@@ -48,6 +48,7 @@ export default function Message({
     createdAt, authorImage, authorName,
     isCompact, isEditing, updatedAt, isAuthor, setEditingId, hideThreadButton,
 }: MessageProps) {
+    const {onOpenMessage, onCloseMessage, parentMessageId} = usePanel()
     const [ApprovalDialog, approval] = useApproval("删除消息", "确定删除消息么? 该操作可能无法撤回.")
     const createdDate = new Date(createdAt)
     const {mutate: updateMessage, isPending: updatingMessage} = useUpdateMessage()
@@ -71,6 +72,8 @@ export default function Message({
         await removeMessage({id}, {
             onSuccess: () => {
                 toast.success("消息删除成功")
+                // 关闭thread面板
+                if (parentMessageId === id) onCloseMessage();
             },
             onError: error => {
                 toast.error("消息删除失败")
@@ -88,9 +91,8 @@ export default function Message({
             }
         })
     }
-    const router = useRouter()
     const handleThread = () => {
-        router.replace(`${window.location.pathname}?parentMessageId=${id}`)
+        onOpenMessage(id)
     }
     return (
         <>
