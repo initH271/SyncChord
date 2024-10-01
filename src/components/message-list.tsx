@@ -88,7 +88,7 @@ export default function MessageList({
                                         id={message._id}
                                         memberId={message.memberId}
                                         authorImage={message.user.image}
-                                        authorName={message.user.name}
+                                        authorName={message.user.name!}
                                         reactions={message.reactions}
                                         body={message.body}
                                         image={message.image}

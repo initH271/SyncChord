@@ -22,13 +22,13 @@ interface MessageProps {
     id: Id<"messages">,
     memberId: string,
     authorImage?: string,
-    authorName?: string,
+    authorName: string,
     reactions: Array<Omit<ReactionsWithCount, "memberId">>,
     body: string,
     image?: string,
     createdAt: number,
     updatedAt?: number,
-    threadCount: number,
+    threadCount?: number,
     threadImage?: string,
     threadTimestamp?: number,
     isEditing: boolean,
@@ -157,7 +157,7 @@ export default function Message({
                             <Avatar className="size-7  hover:opacity-75 transition rounded-md">
                                 <AvatarImage src={authorImage} className={"rounded-md"}/>
                                 <AvatarFallback className="rounded-md bg-sky-400 text-white text-xs">
-                                    {authorName!.charAt(0).toUpperCase()}
+                                    {authorName.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                             </Avatar>
                         </button>

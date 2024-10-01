@@ -11,6 +11,9 @@ import {useEffect} from "react";
 import {useRouter} from "next/navigation";
 import NoContentPage from "@/components/no-content-page";
 import {usePanel} from "@/hooks/use-panel";
+import {Loader2} from "lucide-react";
+import ThreadPanel from "@/components/thread-panel";
+import {Id} from "../../../../convex/_generated/dataModel";
 
 interface WorkSpaceIdLayoutProps {
     children: React.ReactNode;
@@ -58,7 +61,15 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                         <>
                             <ResizableHandle withHandle/>
                             <ResizablePanel defaultSize={30} minSize={20}>
-                                对消息{parentMessageId}的主题讨论
+                                {parentMessageId ?
+                                    (<ThreadPanel
+                                        messageId={parentMessageId as Id<"messages">}
+                                        onCloseThread={onCloseMessage}
+                                    />) :
+                                    (<div className={"flex h-full items-center justify-center"}>
+                                        <Loader2 className={"animate-spin size-7 text-muted-foreground"}/>
+                                    </div>)
+                                }
                             </ResizablePanel>
                         </>
                     )}
