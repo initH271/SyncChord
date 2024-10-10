@@ -8,13 +8,15 @@ import ChannelHeader from "@/app/workspace/[workspaceId]/channel/[channelId]/cha
 import {ChatInput} from "@/app/workspace/[workspaceId]/channel/[channelId]/chat-input";
 import {useGetMessages} from "@/features/messages/api/use-get-messages";
 import MessageList from "@/components/message-list";
+import {usePanel} from "@/hooks/use-panel";
 
 
 export default function ChannelIdPage() {
     const channelId = useChannelId()
     const {data: channel, isLoading: channelLoading} = useGetChannel({channelId})
     const {results, status, loadMore} = useGetMessages({channelId})
-    console.log("messages: ", results)
+    const {parentMessageId, onCloseMessage} = usePanel()
+    const showPanel = !!parentMessageId;
     if (channelLoading || status === "LoadingFirstPage") {
         return <LoadingPage/>
     }
@@ -32,7 +34,7 @@ export default function ChannelIdPage() {
                 isLoadingMore={status === "LoadingMore"}
                 canLoadMore={status === "CanLoadMore"}
             />
-            <ChatInput placeholder={`说些什么在 # ${channel.name}`}/>
+            {!showPanel && <ChatInput placeholder={`说些什么在 # ${channel.name}`}/>}
         </div>
     )
 }
