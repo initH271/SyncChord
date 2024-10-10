@@ -131,7 +131,9 @@ export default function Message({
                                     ) : null
                                 }
                                 <div className={"flex justify-between items-center"}>
-                                    <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    {reactions.length > 0 &&
+                                        <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    }
                                     {!!threadCount && !hideThreadButton && (
                                         <span className={"text-xs text-muted-foreground"}>
                                         {threadCount} 回复
@@ -202,7 +204,9 @@ export default function Message({
                                 }
 
                                 <div className={"flex justify-between items-center"}>
-                                    <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    {reactions.length > 0 &&
+                                        <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    }
                                     {!!threadCount && !hideThreadButton && (
                                         <span className={"text-xs text-muted-foreground"}>
                                         {threadCount} 回复
