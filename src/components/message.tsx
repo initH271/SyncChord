@@ -47,6 +47,7 @@ export default function Message({
     reactions, body, image, id,
     createdAt, authorImage, authorName,
     isCompact, isEditing, updatedAt, isAuthor, setEditingId, hideThreadButton,
+    threadCount, threadTimestamp
 }: MessageProps) {
     const {onOpenMessage, onCloseMessage, parentMessageId} = usePanel()
     const [ApprovalDialog, approval] = useApproval("删除消息", "确定删除消息么? 该操作可能无法撤回.")
@@ -129,7 +130,16 @@ export default function Message({
                                         <span className="text-xs text-muted-foreground">(已编辑)</span>
                                     ) : null
                                 }
-                                <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                <div className={"flex justify-between items-center"}>
+                                    <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    {!!threadCount && !hideThreadButton && (
+                                        <span className={"text-xs text-muted-foreground"}>
+                                        {threadCount} 回复
+                                            {threadCount > 0 && (<span className={"pl-2"}>
+                                            最后回复时间 {formatFullTime(new Date(threadTimestamp!))}
+                                        </span>)}
+                                    </span>)}
+                                </div>
                             </div>)}
                     </div>
                     {
@@ -190,7 +200,17 @@ export default function Message({
                                         <span className="text-xs text-muted-foreground">(已编辑)</span>
                                     ) : null
                                 }
-                                <MessageReactions reactions={reactions} onChange={handleReaction}/>
+
+                                <div className={"flex justify-between items-center"}>
+                                    <MessageReactions reactions={reactions} onChange={handleReaction}/>
+                                    {!!threadCount && !hideThreadButton && (
+                                        <span className={"text-xs text-muted-foreground"}>
+                                        {threadCount} 回复
+                                            {threadCount > 0 && (<span className={"pl-2"}>
+                                            最后回复时间 {formatFullTime(new Date(threadTimestamp!))}
+                                        </span>)}
+                                    </span>)}
+                                </div>
                             </div>)}
                     </div>
                     {
