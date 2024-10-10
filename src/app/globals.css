@@ -150,4 +150,5 @@ body,
 .msgl-message-scrollbar {
     overflow-y: auto;
     scrollbar-width: thin;
+    scrollbar-color: #bfbfbf white;
 }
