@@ -7,7 +7,7 @@ import WorkSpaceSidebar from "./workspace-sidebar";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {useGetWorkspace} from "@/features/workspaces/api/use-get-workspace";
 import LoadingPage from "@/components/loading-page";
-import {useEffect} from "react";
+import {ReactNode, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import NoContentPage from "@/components/no-content-page";
 import {usePanel} from "@/hooks/use-panel";
@@ -16,7 +16,7 @@ import ThreadPanel from "@/components/thread-panel";
 import {Id} from "../../../../convex/_generated/dataModel";
 
 interface WorkSpaceIdLayoutProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 
@@ -54,7 +54,7 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
 
-                    <ResizablePanel defaultSize={85} minSize={50} maxSize={85}>
+                    <ResizablePanel defaultSize={85} minSize={40} maxSize={85}>
                         {children}
                     </ResizablePanel>
                     {showPanel && (
@@ -73,7 +73,6 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                             </ResizablePanel>
                         </>
                     )}
-
                 </ResizablePanelGroup>
             </div>
         </div>

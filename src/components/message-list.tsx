@@ -19,7 +19,7 @@ interface MessageListProps {
 
 const TIME_THRESHOLD = 3 // 消息间隔阈值
 
-const formatDateLabel = (dateString: string) => {
+export const formatDateLabel = (dateString: string) => {
     const date = new Date(dateString)
     if (isToday(date)) return "今天";
     if (isYesterday(date)) return "昨天";

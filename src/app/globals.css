@@ -148,7 +148,6 @@ body,
 
 /*MessageList组件自定义样式*/
 .msgl-message-scrollbar {
-    @apply overflow-y-auto;
+    overflow-y: auto;
     scrollbar-width: thin;
-    
 }
