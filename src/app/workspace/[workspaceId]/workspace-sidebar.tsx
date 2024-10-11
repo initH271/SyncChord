@@ -10,6 +10,7 @@ import {useGetMembers} from "@/features/members/api/use-get-members";
 import WorkspaceSidebarUserItem from "@/app/workspace/[workspaceId]/workspace-sidebar-user-item";
 import {useCreateChannelModal} from "@/features/channels/store/use-create-channel-modal";
 import {useChannelId} from "@/hooks/use-channel-id";
+import {useMemberId} from "@/hooks/use-member-id";
 
 export default function WorkSpaceSidebar() {
     const workspaceId = useWorkspaceId()
@@ -18,6 +19,7 @@ export default function WorkSpaceSidebar() {
     const {data: workspace, isLoading: workspaceLoading} = useGetWorkspace({id: workspaceId})
     const {data: channels, isLoading: channelsLoading} = useGetChannels({workspaceId})
     const {data: members, isLoading: membersLoading} = useGetMembers({workspaceId})
+    const toMemberId = useMemberId()
     const [_open, setOpen] = useCreateChannelModal()
     if (workspaceLoading || memberLoading) {
         return (
@@ -59,7 +61,8 @@ export default function WorkSpaceSidebar() {
             <WorkspaceSidebarSection key={"allMembers"} label={"所有成员"} hint={"添加成员"} onNew={() => {}}>
                 {
                     members?.map((member) => (
-                        <WorkspaceSidebarUserItem key={member._id} id={member._id} user={member.user}/>
+                        <WorkspaceSidebarUserItem key={member._id} id={member._id} user={member.user}
+                                                  variant={member._id === toMemberId ? "active" : "default"}/>
                     ))
                 }
             </WorkspaceSidebarSection>
