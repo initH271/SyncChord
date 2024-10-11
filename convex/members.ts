@@ -2,6 +2,7 @@ import {v} from "convex/values";
 import {query, QueryCtx} from "./_generated/server";
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {Doc, Id} from "./_generated/dataModel";
+import {getMember} from "./common";
 
 // API: 获取用户
 const populateUser = (ctx: QueryCtx, id: Id<"users">): Promise<Doc<"users"> | null> => {
@@ -50,5 +51,23 @@ export const current = query({
             (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId)
         ).unique();
         return member
+    },
+})
+// API: 获取用户在workspace的member
+export const getById = query({
+    args: {
+        memberId: v.id("members")
+    },
+    async handler(ctx, {memberId}) {
+        const userId = await getAuthUserId(ctx)
+        if (!userId) return null;
+        const member = await ctx.db.get(memberId);
+        if (!member) return null;
+        // 不在同一workspace
+        const currentMember = await getMember(ctx, userId, member.workspaceId)
+        if (!currentMember) return null
+        const user = await populateUser(ctx, member.userId)
+        if (!user) return null;
+        return {...member, user}
     },
 })
