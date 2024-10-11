@@ -10,16 +10,13 @@ type Options = {
 }
 
 type RequestType = {
-    parentMessageId?: Id<"messages">,
     workspaceId: Id<"workspaces">,
-    channelId?: Id<"channels">,
-    conversationId?: string,
-    body: string,
-    image?: Id<"_storage">,
+    toMemberId: Id<"members">,
 }
-type ResponseType = Id<"messages"> | null
+type ResponseType = Id<"conversations"> | null
 
-export const useCreateMessage = () => {
+// 创建或获取已存在私聊对话 API hook
+export const useCreateOrGetConversation = () => {
     const [data, setData] = useState<ResponseType>(null)
     const [error, setError] = useState<Error | null>(null)
     const [status, setStatus] = useState<"success" | "error" | "settled" | "pending" | null>(null)
@@ -29,14 +26,14 @@ export const useCreateMessage = () => {
     const isError = useMemo(() => status === "error", [status])
     const isSettled = useMemo(() => status === "settled", [status])
 
-    const mutation = useMutation(api.messages.create)
+    const mutation = useMutation(api.conversations.createOrGet)
     const mutate = useCallback(async (values: RequestType, options?: Options) => {
         try {
             setData(null)
             setError(null)
             setStatus("pending")
 
-            const response = await mutation({...values, conversationId: values.conversationId as Id<"conversations">})
+            const response = await mutation(values)
             options?.onSuccess?.(response)
             setData(response)
             setStatus("success")
