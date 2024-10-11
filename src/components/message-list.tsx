@@ -10,6 +10,8 @@ import {Loader, Loader2} from "lucide-react";
 interface MessageListProps {
     channelName?: string
     channelCreationTime?: number,
+    memberName?: string,
+    memberImage?: string,
     data: GetMessagesReturnType | undefined,
     loadMore: () => void,
     isLoadingMore: boolean,
