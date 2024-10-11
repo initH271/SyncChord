@@ -105,7 +105,7 @@ export default function MessageList({
                                         isEditing={editingId === message._id}
                                         setEditingId={setEditingId}
                                         isCompact={isCompact}
-                                        hideThreadButton={variant === "thread"}
+                                        hideThreadButton={variant === "thread" || variant === "conversation"}
                                     />
                                 )
                             })

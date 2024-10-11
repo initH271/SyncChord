@@ -14,6 +14,7 @@ import useApproval from "@/hooks/use-confirm";
 import {useToggleReaction} from "@/features/reactions/api/use-toggle-reaction";
 import MessageReactions from "@/components/message-reactions";
 import {usePanel} from "@/hooks/use-panel";
+import MessageThreadBar from "@/components/message-thread-bar";
 
 const BodyRenderer = dynamic(() => import("@/components/body-renderer"), {ssr: false})
 const Editor = dynamic(() => import("@/components/editor"), {ssr: false})
@@ -47,7 +48,7 @@ export default function Message({
     reactions, body, image, id,
     createdAt, authorImage, authorName,
     isCompact, isEditing, updatedAt, isAuthor, setEditingId, hideThreadButton,
-    threadCount, threadTimestamp
+    threadCount, threadTimestamp, threadImage
 }: MessageProps) {
     const {onOpenMessage, onCloseMessage, parentMessageId} = usePanel()
     const [ApprovalDialog, approval] = useApproval("删除消息", "确定删除消息么? 该操作可能无法撤回.")
@@ -130,17 +131,17 @@ export default function Message({
                                         <span className="text-xs text-muted-foreground">(已编辑)</span>
                                     ) : null
                                 }
-                                <div className={"flex justify-between items-center"}>
+                                <div className={"flex justify-start items-center"}>
                                     {reactions.length > 0 &&
                                         <MessageReactions reactions={reactions} onChange={handleReaction}/>
                                     }
-                                    {!!threadCount && !hideThreadButton && (
-                                        <span className={"text-xs text-muted-foreground"}>
-                                        {threadCount} 回复
-                                            {threadCount > 0 && (<span className={"pl-2"}>
-                                            最后回复时间 {formatFullTime(new Date(threadTimestamp!))}
-                                        </span>)}
-                                    </span>)}
+                                    {!!threadCount && !hideThreadButton &&
+                                        <MessageThreadBar
+                                            onClick={handleThread}
+                                            lastImage={threadImage}
+                                            count={threadCount}
+                                            lastTime={formatFullTime(new Date(threadTimestamp!))}/>
+                                    }
                                 </div>
                             </div>)}
                     </div>
@@ -203,17 +204,17 @@ export default function Message({
                                     ) : null
                                 }
 
-                                <div className={"flex justify-between items-center"}>
+                                <div className={"flex justify-start items-center"}>
                                     {reactions.length > 0 &&
                                         <MessageReactions reactions={reactions} onChange={handleReaction}/>
                                     }
-                                    {!!threadCount && !hideThreadButton && (
-                                        <span className={"text-xs text-muted-foreground"}>
-                                        {threadCount} 回复
-                                            {threadCount > 0 && (<span className={"pl-2"}>
-                                            最后回复时间 {formatFullTime(new Date(threadTimestamp!))}
-                                        </span>)}
-                                    </span>)}
+                                    {!!threadCount && !hideThreadButton &&
+                                        <MessageThreadBar
+                                            onClick={handleThread}
+                                            lastImage={threadImage}
+                                            count={threadCount}
+                                            lastTime={formatFullTime(new Date(threadTimestamp!))}/>
+                                    }
                                 </div>
                             </div>)}
                     </div>
