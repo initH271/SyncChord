@@ -10,6 +10,13 @@ export const getNotDeletedMember = (ctx: QueryCtx, userId: Id<"users">, workspac
         .unique()
 }
 
+// 获取用户所在当前workspace的member身份信息
+export const getMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspaces">) => {
+    return ctx.db.query("members")
+        .withIndex("by_workspace_id_user_id", q => q.eq("workspaceId", workspaceId).eq("userId", userId))
+        .unique()
+}
+
 // 获取用户信息
 export const populateUser = (ctx: QueryCtx, userId: Id<"users">) => {
     return ctx.db.get(userId)

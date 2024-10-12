@@ -1,7 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation, query} from "./_generated/server";
 import {v} from "convex/values";
-import {getNotDeletedMember} from "./common";
+import {getMember, getNotDeletedMember} from "./common";
 
 // API: 获取用户所有workspace
 export const get = query({
@@ -71,12 +71,16 @@ export const join = mutation({
         const workspace = await ctx.db.get(args.workspaceId)
         if (!workspace) throw new Error("不存在的工作空间")
         if (args.joinCode.toLowerCase() !== workspace.joinCode) throw new Error("不存在的邀请码.")
-        const member = await getNotDeletedMember(ctx, userId, args.workspaceId);
+        const member = await getMember(ctx, userId, args.workspaceId);
         if (!member) {
             await ctx.db.insert("members", {
                 userId,
                 workspaceId: args.workspaceId,
                 role: "member"
+            })
+        } else if (member.isDeleted) {
+            await ctx.db.patch(member._id, {
+                isDeleted: false,
             })
         }
         return args.workspaceId
