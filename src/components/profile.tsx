@@ -10,6 +10,7 @@ import {useCurrentMember} from "@/features/members/api/use-current-member";
 import {useWorkspaceId} from "@/hooks/use-workspace-id";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 
 interface ProfileProps {
     memberId: string;
@@ -80,10 +81,23 @@ export default function Profile({memberId, onClose}: ProfileProps) {
                             <p className={"font-bold text-xl"}>{member.user.name}</p>
                             {currentMember?.role === "admin" && currentMember._id !== memberId && (
                                 <div className={"flex items-center mt-4 gap-2"}>
-                                    <Button variant={"outline"} className={"w-full capitalize"}>
-                                        {member.role === "admin" ? "管理员" : "普通成员"} <ChevronDownIcon
-                                        className={"size-4 ml-2"}/>
-                                    </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant={"outline"} className={"w-full capitalize"}>
+                                                {member.role === "admin" ? "管理员" : "普通成员"} <ChevronDownIcon
+                                                className={"size-4 ml-2"}/>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                            <DropdownMenuItem onClick={() => {
+                                                onUpdateMember(member.role === "admin" ? "member" : "admin")
+                                            }} className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
+                                                <div className="flex items-center gap-1">
+                                                    {member.role === "admin" ? "普通成员" : "管理员"}
+                                                </div>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                     <Button variant={"outline"} className={"w-full capitalize"}
                                             onClick={onRemoveMember}>
                                         删除

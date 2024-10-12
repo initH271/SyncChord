@@ -56,7 +56,7 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
 
-                    <ResizablePanel id={"ws-1"} order={1} defaultSize={55} minSize={40} maxSize={85}>
+                    <ResizablePanel id={"ws-1"} order={1} defaultSize={65} minSize={40} maxSize={85}>
                         {children}
                     </ResizablePanel>
                     {showMessagePanel && ( // thread面板
