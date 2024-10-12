@@ -1,9 +1,15 @@
 import {Button} from "@/components/ui/button";
-import {AlertTriangle, Loader2, MailIcon, XIcon} from "lucide-react";
+import {AlertTriangle, ChevronDownIcon, Loader2, MailIcon, XIcon} from "lucide-react";
 import {useGetMember} from "@/features/members/api/use-get-member";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Separator} from "@/components/ui/separator";
 import Link from "next/link";
+import {useUpdateMember} from "@/features/members/api/use-update-member";
+import {useRemoveMember} from "@/features/members/api/use-remove-member";
+import {useCurrentMember} from "@/features/members/api/use-current-member";
+import {useWorkspaceId} from "@/hooks/use-workspace-id";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 interface ProfileProps {
     memberId: string;
@@ -12,9 +18,34 @@ interface ProfileProps {
 
 
 export default function Profile({memberId, onClose}: ProfileProps) {
+    const workspaceId = useWorkspaceId()
+    const {data: currentMember, isLoading: loadingCurrentMember} = useCurrentMember({workspaceId})
+    const {mutate: updateMember, isPending: updatingMember} = useUpdateMember()
+    const {mutate: removeMember, isPending: removingMember} = useRemoveMember()
     const {data: member, isLoading: loadingMember} = useGetMember({memberId})
-
-    if (loadingMember) {
+    const router = useRouter()
+    const onRemoveMember = async () => {
+        await removeMember({id: memberId}, {
+            onSuccess: data => {
+                toast.success("操作成功")
+            },
+            onError: error => {
+                toast.error("操作失败:" + error.message)
+            },
+        });
+        router.replace(`${window.location.origin}/workspace/${workspaceId}`)
+    }
+    const onUpdateMember = async (role: "admin" | "member") => {
+        await updateMember({id: memberId, role}, {
+            onSuccess: data => {
+                toast.success("操作成功")
+            },
+            onError: error => {
+                toast.error("操作失败:" + error.message)
+            }
+        })
+    }
+    if (loadingMember || loadingCurrentMember) {
         return (
             <div className={"flex h-full items-center justify-center"}>
                 <Loader2 className={"animate-spin size-7 text-muted-foreground"}/>
@@ -45,10 +76,29 @@ export default function Profile({memberId, onClose}: ProfileProps) {
                                 {member.user.name?.charAt(0).toUpperCase()}
                             </AvatarFallback>
                         </Avatar>
-                        <div className={"flex flex-col p-4"}>
-                            <p className={"font-bold text-xl"}>
-                                {member.user.name}
-                            </p>
+                        <div className={"flex flex-col p-4 items-center"}>
+                            <p className={"font-bold text-xl"}>{member.user.name}</p>
+                            {currentMember?.role === "admin" && currentMember._id !== memberId && (
+                                <div className={"flex items-center mt-4 gap-2"}>
+                                    <Button variant={"outline"} className={"w-full capitalize"}>
+                                        {member.role === "admin" ? "管理员" : "普通成员"} <ChevronDownIcon
+                                        className={"size-4 ml-2"}/>
+                                    </Button>
+                                    <Button variant={"outline"} className={"w-full capitalize"}
+                                            onClick={onRemoveMember}>
+                                        删除
+                                    </Button>
+                                </div>
+                            )}
+                            {currentMember?.role !== "admin" && currentMember?._id === memberId && (
+                                <div className={"flex items-center mt-4 gap-2"}>
+                                    <Button variant={"outline"}
+                                            className={"w-full capitalize hover:bg-red-600 hover:text-white"}
+                                            onClick={onRemoveMember}>
+                                        退出工作空间
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <Separator/>
