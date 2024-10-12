@@ -3,7 +3,7 @@ import {mutation, query, QueryCtx} from "./_generated/server";
 import {v} from "convex/values";
 import {Doc, Id} from "./_generated/dataModel";
 import {paginationOptsValidator} from "convex/server";
-import {getMember, populateMember, populateUser} from "./common";
+import {getNotDeletedMember, populateMember, populateUser} from "./common";
 
 /**
  * 导出messages API相关参数类型
@@ -46,7 +46,7 @@ const populateThread = async (ctx: QueryCtx, messageId: Id<"messages">) => {
         }
     })
     const lastMember = await populateMember(ctx, lastMessage.memberId)
-    if (!lastMember) {
+    if (!lastMember || lastMember.isDeleted) {
         return {
             count: messages.length,
             image: undefined, // 最后一个回复用户的头像
@@ -90,7 +90,7 @@ export const create = mutation({
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为");
 
-        const member = await getMember(ctx, userId, workspaceId);
+        const member = await getNotDeletedMember(ctx, userId, workspaceId);
         if (!member) throw new Error("未授权行为")
         let _conversationId = conversationId
         // thread回复处理, 仅有parentMessageId的情况
@@ -149,8 +149,9 @@ export const get = query({
             page: ( // 对message填充更详细的内容
                 await Promise.all(results.page.map(async (message) => {
                     const member = await populateMember(ctx, message.memberId);
-                    const user = member ? await populateUser(ctx, member.userId) : null;
-                    if (!member || !user) return null;
+                    if (!member || member.isDeleted) return null;
+                    const user = await populateUser(ctx, member.userId);
+                    if (!user) return null;
 
                     const reactions = await populateReaction(ctx, message._id);
                     const thread = await populateThread(ctx, message._id);
@@ -193,10 +194,10 @@ export const getById = query({
         if (!userId) return null;
         const message = await ctx.db.get(id)
         if (!message) return null;
-        const currentMember = await getMember(ctx, userId, message.workspaceId)
+        const currentMember = await getNotDeletedMember(ctx, userId, message.workspaceId)
         if (!currentMember) return null;
         const member = await populateMember(ctx, message.memberId)
-        if (!member) return null;
+        if (!member || member.isDeleted) return null;
         const user = await populateUser(ctx, member.userId)
         if (!user) return null;
         const reactions = await populateReaction(ctx, id)

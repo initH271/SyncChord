@@ -3,10 +3,11 @@ import {Id} from "./_generated/dataModel";
 
 
 // 获取用户所在当前workspace的member身份信息
-export const getMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspaces">) => {
-    return ctx.db.query("members").withIndex("by_workspace_id_user_id",
-        (q) => q.eq("workspaceId", workspaceId).eq("userId", userId)
-    ).unique()
+export const getNotDeletedMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspaces">) => {
+    return ctx.db.query("members")
+        .withIndex("by_workspace_id_user_id", q => q.eq("workspaceId", workspaceId).eq("userId", userId))
+        .filter(q => q.neq(q.field("isDeleted"), true))
+        .unique()
 }
 
 // 获取用户信息

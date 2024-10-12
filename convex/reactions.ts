@@ -1,7 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation} from "./_generated/server";
 import {v} from "convex/values";
-import {getMember} from "./common";
+import {getNotDeletedMember} from "./common";
 
 
 // 切换reaction值, 返回删除或添加的reactionId
@@ -17,7 +17,7 @@ export const toggle = mutation({
         const message = await ctx.db.get(messageId)
         if (!message || message.isDeleted) throw new Error("消息不存在");
 
-        const member = await getMember(ctx, userId, message.workspaceId)
+        const member = await getNotDeletedMember(ctx, userId, message.workspaceId)
         // 不存在的成员
         if (!member) throw new Error("未授权行为");
         // 对该条消息用户是否已存在reaction

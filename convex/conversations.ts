@@ -1,7 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation} from "./_generated/server";
 import {v} from "convex/values";
-import {getMember} from "./common";
+import {getNotDeletedMember} from "./common";
 
 // 创建或获取私聊对话API
 export const createOrGet = mutation({
@@ -14,7 +14,7 @@ export const createOrGet = mutation({
     }) => {
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为");
-        const currentMember = await getMember(ctx, userId, workspaceId);
+        const currentMember = await getNotDeletedMember(ctx, userId, workspaceId);
         if (!currentMember) throw new Error("未授权行为")
         const toMember = await ctx.db.get(toMemberId)
         if (!toMember) throw new Error("成员不存在")
