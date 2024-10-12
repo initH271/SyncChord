@@ -35,7 +35,8 @@ const WorkspaceSidebarUserItem = ({user, variant, id}: WorkspaceSidebarUserItemP
     // TODO: 当前用户的特别处理, 置顶显示 or 点击跳转到个人资料页
     return (
         <Button className={cn(userItemVariants({variant}))} variant={"stone"} asChild>
-            <Link href={currentMember?._id !== id ? `/workspace/${workspaceId}/member/${id}` : ""}>
+            <Link href={`/workspace/${workspaceId}/member/${id}`}>
+                {/*<Link href={currentMember?._id !== id ? `/workspace/${workspaceId}/member/${id}` : ""}>*/}
                 <Avatar className={"size-6 rounded-md mr-1"}>
                     <AvatarImage autoSave={user._id} className={"rounded-md"} src={user.image}/>
                     <AvatarFallback className={"rounded-md bg-rose-300"}>

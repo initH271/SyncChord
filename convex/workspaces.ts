@@ -1,6 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation, query} from "./_generated/server";
 import {v} from "convex/values";
+import {getNotDeletedMember} from "./common";
 
 // API: 获取用户所有workspace
 export const get = query({
@@ -11,6 +12,7 @@ export const get = query({
 
         const members = await ctx.db.query("members")
             .withIndex("by_user_id", (q) => q.eq("userId", userId))
+            .filter(q => q.neq(q.field("isDeleted"), true))
             .collect();
         const workspaces = []
         const workspaceIds = members.map(m => m.workspaceId);
@@ -32,10 +34,7 @@ export const getInfoById = query({
         if (!userId) throw new Error("未授权行为.");
         const workspace = await ctx.db.get(args.id)
         if (!workspace) throw new Error("不存在的工作空间")
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
-            .unique();
-
+        const member = await getNotDeletedMember(ctx, userId, workspace._id);
         return {
             name: workspace.name,
             isMember: !!member,
@@ -53,9 +52,7 @@ export const getById = query({
 
         // if (!userId) throw new Error("未授权行为.");
         if (!userId) return null;
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
-            .unique();
+        const member = await getNotDeletedMember(ctx, userId, args.id);
         if (!member) return null;
         return await ctx.db.get(args.id)
     }
@@ -74,9 +71,7 @@ export const join = mutation({
         const workspace = await ctx.db.get(args.workspaceId)
         if (!workspace) throw new Error("不存在的工作空间")
         if (args.joinCode.toLowerCase() !== workspace.joinCode) throw new Error("不存在的邀请码.")
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
-            .unique();
+        const member = await getNotDeletedMember(ctx, userId, args.workspaceId);
         if (!member) {
             await ctx.db.insert("members", {
                 userId,
@@ -105,9 +100,7 @@ export const newJoinCode = mutation({
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为.");
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.workspaceId).eq("userId", userId))
-            .unique();
+        const member = await getNotDeletedMember(ctx, userId, args.workspaceId);
         if (!member || member.role !== "admin") throw new Error("未授权行为");
         const newCode = generateJoinCode()
         await ctx.db.patch(args.workspaceId, {
@@ -155,9 +148,7 @@ export const update = mutation({
     async handler(ctx, args) {
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为.");
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
-            .unique();
+        const member = await getNotDeletedMember(ctx, userId, args.id);
         if (!member || member.role !== "admin") throw new Error("未授权行为");
 
         await ctx.db.patch(args.id, {
@@ -175,9 +166,7 @@ export const remove = mutation({
     async handler(ctx, args) {
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为.");
-        const member = await ctx.db.query("members")
-            .withIndex("by_workspace_id_user_id", (q) => q.eq("workspaceId", args.id).eq("userId", userId))
-            .unique();
+        const member = await getNotDeletedMember(ctx, userId, args.id);
         if (!member || member.role !== "admin") throw new Error("未授权行为");
         // 物理删除 成员, 再删除空间
         const [members] = await Promise.all([

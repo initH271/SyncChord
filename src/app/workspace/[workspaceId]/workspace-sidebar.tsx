@@ -11,8 +11,11 @@ import WorkspaceSidebarUserItem from "@/app/workspace/[workspaceId]/workspace-si
 import {useCreateChannelModal} from "@/features/channels/store/use-create-channel-modal";
 import {useChannelId} from "@/hooks/use-channel-id";
 import {useMemberId} from "@/hooks/use-member-id";
+import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 
 export default function WorkSpaceSidebar() {
+    const router = useRouter()
     const workspaceId = useWorkspaceId()
     const channelId = useChannelId()
     const {data: currentMember, isLoading: memberLoading} = useCurrentMember({workspaceId})
@@ -21,6 +24,10 @@ export default function WorkSpaceSidebar() {
     const {data: members, isLoading: membersLoading} = useGetMembers({workspaceId})
     const toMemberId = useMemberId()
     const [_open, setOpen] = useCreateChannelModal()
+    useEffect(() => {
+        if (workspaceLoading || memberLoading) return;
+        if (!workspace || !currentMember) router.replace("/");
+    }, [workspace, currentMember, router]);
     if (workspaceLoading || memberLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
@@ -30,6 +37,7 @@ export default function WorkSpaceSidebar() {
         )
     }
     if (!workspace || !currentMember) {
+
         return (
             <div className="flex  gap-x-2 items-center justify-center h-full">
                 <TriangleAlert className="size-5"/>

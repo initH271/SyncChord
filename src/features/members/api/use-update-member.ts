@@ -10,7 +10,7 @@ type Options = {
 }
 
 type RequestType = {
-    id: Id<"members">,
+    id: string,
     role: "admin" | "member",
 }
 type ResponseType = Id<"members"> | null
@@ -33,7 +33,7 @@ export const useUpdateMember = () => {
             setError(null)
             setStatus("pending")
 
-            const response = await mutation(values)
+            const response = await mutation({...values, id: values.id as Id<"members">})
             options?.onSuccess?.(response)
             setData(response)
             setStatus("success")

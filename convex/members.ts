@@ -100,10 +100,12 @@ export const remove = mutation({
         const userId = await getAuthUserId(ctx)
         if (!userId) throw new Error("未授权行为");
         const member = await ctx.db.get(id);
-        if (!member || member.isDeleted || member.role === "admin") throw new Error("未授权行为");
+        // member不存在
+        if (!member || member.isDeleted) throw new Error("成员不存在");
+        if (member.role === "admin") throw new Error("不能删除管理员");
         const currentMember = await getNotDeletedMember(ctx, userId, member.workspaceId)
-        if (!currentMember || currentMember.role !== "admin") throw new Error("未授权行为");
-        if (currentMember._id === id && currentMember.role === "admin") throw new Error("身为管理员 不能删除自己");
+        if (!currentMember) throw new Error("用户不在该工作空间");
+        if (currentMember.role !== "admin" && currentMember._id !== id) throw new Error("普通用户无权操作");
         // 先删除所有消息, reaction和对话
         const [messages, reactions, conversations] = await Promise.all([
             await ctx.db.query("messages").withIndex("by_member_id", q => q.eq("memberId", member._id)).collect(),
@@ -132,6 +134,6 @@ export const remove = mutation({
             deletedAt: Date.now(),
         })
         const existed = await ctx.db.get(id);
-        if (existed) throw new Error("删除失败");
+        if (existed && !existed.isDeleted) throw new Error("删除失败");
     }
 })

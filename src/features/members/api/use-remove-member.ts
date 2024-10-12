@@ -10,7 +10,7 @@ type Options = {
 }
 
 type RequestType = {
-    id: Id<"members">,
+    id: string,
 }
 type ResponseType = Id<"messages"> | null
 
@@ -32,7 +32,7 @@ export const useRemoveMember = () => {
             setError(null)
             setStatus("pending")
 
-            const response = await mutation(values)
+            const response = await mutation({id: values.id as Id<"members">})
             options?.onSuccess?.(response)
             setData(response)
             setStatus("success")

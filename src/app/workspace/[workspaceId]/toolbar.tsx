@@ -6,17 +6,22 @@ import {useWorkspaceId} from "@/hooks/use-workspace-id"
 import {Info, Search} from "lucide-react"
 import {useRouter} from "next/navigation"
 import {useEffect} from "react"
+import {usePanel} from "@/hooks/use-panel";
+import {useCurrentMember} from "@/features/members/api/use-current-member";
 
 export const Toolbar = () => {
     const router = useRouter()
     const workspaceId = useWorkspaceId()
     const {data, isLoading} = useGetWorkspace({id: workspaceId})
+    const {onOpenProfile} = usePanel()
+    const {data: currentMember, isLoading: loadingCurrentMember} = useCurrentMember({workspaceId})
     useEffect(() => {
         if (!isLoading && data === null) {
             router.push("/")
         }
     }, [data, router, isLoading])
-    if (isLoading) {
+
+    if (isLoading || loadingCurrentMember) {
         return (
             <div
                 className="bg-[#fdfcfa] flex items-center justify-center h-10 p-1.5 border-solid border-b-[1px] border-[#e5e7eb]">
@@ -44,7 +49,8 @@ export const Toolbar = () => {
                 </Button>
             </div>
             <div className="ml-auto flex-1 flex items-center justify-end">
-                <Button className="bg-transparent hover:bg-[#f0eeeb] text-accent" size={"sm"} variant={"ghost"}>
+                <Button className="bg-transparent hover:bg-[#f0eeeb] text-accent" size={"sm"} variant={"ghost"}
+                        onClick={() => onOpenProfile(currentMember!._id)}>
                     <Info className="size-5 text-black font-semibold"/>
                 </Button>
             </div>
