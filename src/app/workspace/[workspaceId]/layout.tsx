@@ -14,6 +14,7 @@ import {usePanel} from "@/hooks/use-panel";
 import {Loader2} from "lucide-react";
 import ThreadPanel from "@/components/thread-panel";
 import {Id} from "../../../../convex/_generated/dataModel";
+import Profile from "@/components/profile";
 
 interface WorkSpaceIdLayoutProps {
     children: ReactNode;
@@ -24,8 +25,9 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
     const workspaceId = useWorkspaceId()
     const {data, isLoading} = useGetWorkspace({id: workspaceId})
     const router = useRouter()
-    const {parentMessageId, onCloseMessage} = usePanel()
-    const showPanel = !!parentMessageId;
+    const {parentMessageId, profileMemberId, onCloseMessage, onCloseProfile} = usePanel()
+    const showMessagePanel = !!parentMessageId;
+    const showProfilePanel = !!profileMemberId;
     useEffect(() => {
         if (isLoading) return;
         if (!data) router.push("/");
@@ -48,24 +50,41 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                     direction="horizontal"
                     autoSaveId={"channel-workspace-layout"}
                 >
-                    <ResizablePanel defaultSize={15} maxSize={20} minSize={15}
+                    <ResizablePanel id={"ws-0"} order={0} defaultSize={15} maxSize={20} minSize={15}
                                     className="bg-[#fdfcfa]">
                         <WorkSpaceSidebar/>
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
 
-                    <ResizablePanel defaultSize={85} minSize={40} maxSize={85}>
+                    <ResizablePanel id={"ws-1"} order={1} defaultSize={55} minSize={40} maxSize={85}>
                         {children}
                     </ResizablePanel>
-                    {showPanel && (
+                    {showMessagePanel && ( // thread面板
                         <>
                             <ResizableHandle withHandle/>
-                            <ResizablePanel defaultSize={30} minSize={20}>
+                            <ResizablePanel id={`ws-2-${parentMessageId}`} order={2} key={parentMessageId}
+                                            defaultSize={30}
+                                            minSize={20}>
                                 {parentMessageId ?
                                     (<ThreadPanel
                                         messageId={parentMessageId as Id<"messages">}
                                         onCloseThread={onCloseMessage}
                                     />) :
+                                    (<div className={"flex h-full items-center justify-center"}>
+                                        <Loader2 className={"animate-spin size-7 text-muted-foreground"}/>
+                                    </div>)
+                                }
+                            </ResizablePanel>
+                        </>
+                    )}
+                    {showProfilePanel && ( // member个人信息面板
+                        <>
+                            <ResizableHandle withHandle/>
+                            <ResizablePanel id={`ws-3-${profileMemberId}`} order={3} key={profileMemberId}
+                                            defaultSize={40}
+                                            minSize={20}>
+                                {profileMemberId ?
+                                    (<Profile memberId={profileMemberId} onClose={onCloseProfile}/>) :
                                     (<div className={"flex h-full items-center justify-center"}>
                                         <Loader2 className={"animate-spin size-7 text-muted-foreground"}/>
                                     </div>)

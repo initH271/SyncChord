@@ -7,6 +7,7 @@ import LoadingPage from "@/components/loading-page";
 import MemberHeader from "@/app/workspace/[workspaceId]/member/[memberId]/member-header";
 import {ChatInput} from "@/app/workspace/[workspaceId]/member/[memberId]/chat-input";
 import MessageList from "@/components/message-list";
+import {usePanel} from "@/hooks/use-panel";
 
 interface ConversationProps {
     conversationId: string;
@@ -22,13 +23,18 @@ export default function Conversation({conversationId}: ConversationProps) {
         status,
         loadMore
     } = useGetMessages({conversationId: conversationId as Id<"conversations">})
+    const {onOpenProfile} = usePanel()
+    const openProfilePanel = () => {
+        onOpenProfile(toMember!._id)
+    }
+
     if (toMemberLoading || status === "LoadingFirstPage" || !toMember) {
         return <LoadingPage/>
     }
-
     return (
         <div className={"h-full flex flex-col bg-white"}>
-            <MemberHeader memberName={toMember.user.name!} memberImage={toMember.user.image}/>
+            <MemberHeader memberName={toMember.user.name!} memberImage={toMember.user.image}
+                          onClick={openProfilePanel}/>
             <MessageList variant={"conversation"}
                          memberImage={toMember.user.image} memberName={toMember.user.name}
                          loadMore={loadMore} canLoadMore={status === "CanLoadMore"}

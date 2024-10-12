@@ -45,7 +45,7 @@ const formatFullTime = (date: Date) => {
 
 
 export default function Message({
-    reactions, body, image, id,
+    reactions, body, image, id, memberId,
     createdAt, authorImage, authorName,
     isCompact, isEditing, updatedAt, isAuthor, setEditingId, hideThreadButton,
     threadCount, threadTimestamp, threadImage
@@ -53,6 +53,7 @@ export default function Message({
     const {onOpenMessage, onCloseMessage, parentMessageId} = usePanel()
     const [ApprovalDialog, approval] = useApproval("删除消息", "确定删除消息么? 该操作可能无法撤回.")
     const createdDate = new Date(createdAt)
+    const {onOpenProfile} = usePanel()
     const {mutate: updateMessage, isPending: updatingMessage} = useUpdateMessage()
     const handleUpdate = async ({body}: { body: string }) => {
         await updateMessage({id, body}, {
@@ -93,8 +94,8 @@ export default function Message({
             }
         })
     }
-    const handleThread = () => {
-        onOpenMessage(id)
+    const handleThread = async () => {
+        await onOpenMessage(id)
     }
     return (
         <>
@@ -165,8 +166,11 @@ export default function Message({
                     // 动画: 右侧消失
                     removingMessage && "bg-rose-700/30 transform transition-all scale-x-0 origin-right duration-500")}>
                     <div className="flex items-start gap-2">
-                        <button className="text-xs text-muted-foreground w-[40px]
-                    leading-[22px] text-center hover:underline">
+                        <button
+                            onClick={() => {
+                                onOpenProfile(memberId)
+                            }}
+                            className="text-xs text-muted-foreground w-[40px] leading-[22px] text-center hover:underline">
                             <Avatar className="size-7  hover:opacity-75 transition rounded-md">
                                 <AvatarImage src={authorImage} className={"rounded-md"}/>
                                 <AvatarFallback className="rounded-md bg-sky-400 text-white text-xs">
@@ -186,7 +190,8 @@ export default function Message({
                             </div>) :
                             (<div className="flex flex-col w-full overflow-hidden">
                                 <div className="text-sm">
-                                    <button onClick={() => {}} className="font-bold text-primary hover:underline">
+                                    <button onClick={() => {onOpenProfile(memberId)}}
+                                            className="font-bold text-primary hover:underline">
                                         {authorName}
                                     </button>
                                     <span>&nbsp;&nbsp;</span>
