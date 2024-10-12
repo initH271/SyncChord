@@ -81,7 +81,8 @@ export default function WorkSpaceIdLayout({children}: WorkSpaceIdLayoutProps) {
                         <>
                             <ResizableHandle withHandle/>
                             <ResizablePanel id={`ws-3-${profileMemberId}`} order={3} key={profileMemberId}
-                                            defaultSize={40}
+                                            defaultSize={20}
+                                            maxSize={30}
                                             minSize={20}>
                                 {profileMemberId ?
                                     (<Profile memberId={profileMemberId} onClose={onCloseProfile}/>) :
