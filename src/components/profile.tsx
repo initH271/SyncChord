@@ -26,14 +26,14 @@ export default function Profile({memberId, onClose}: ProfileProps) {
     const {mutate: removeMember, isPending: removingMember} = useRemoveMember()
     const {data: member, isLoading: loadingMember} = useGetMember({memberId})
     const router = useRouter()
-    const [LeaveDialog, comfirmLeave] = useApproval("离开工作空间", "你确定要离开么?")
-    const [RemoveDialog, comfirmRemove] = useApproval("删除成员", `你确定要删除${member?.user.name}么?`)
-    const [UpdateDialog, comfirmUpdate] = useApproval("修改成员身份", `你确定要修改${member?.user.name}的角色么?`)
+    const [LeaveDialog, confirmLeave] = useApproval("离开工作空间", "你确定要离开么?")
+    const [RemoveDialog, confirmRemove] = useApproval("删除成员", `你确定要删除${member?.user.name}么?`)
+    const [UpdateDialog, confirmUpdate] = useApproval("修改成员身份", `你确定要修改${member?.user.name}的角色么?`)
     const onRemoveMember = async () => {
-        const ok = await comfirmRemove()
+        const ok = await confirmRemove()
         if (!ok) return;
         await removeMember({id: memberId}, {
-            onSuccess: data => {
+            onSuccess: () => {
                 toast.success("操作成功")
                 router.replace(`${window.location.origin}/workspace/${workspaceId}`)
             },
@@ -43,10 +43,10 @@ export default function Profile({memberId, onClose}: ProfileProps) {
         });
     }
     const onLeaveMember = async () => {
-        const ok = await comfirmLeave()
+        const ok = await confirmLeave()
         if (!ok) return;
         await removeMember({id: memberId}, {
-            onSuccess: data => {
+            onSuccess: () => {
                 toast.success("操作成功")
                 router.replace(`${window.location.origin}`)
             },
@@ -56,10 +56,10 @@ export default function Profile({memberId, onClose}: ProfileProps) {
         });
     }
     const onUpdateMember = async (role: "admin" | "member") => {
-        const ok = await comfirmUpdate()
+        const ok = await confirmUpdate()
         if (!ok) return;
         await updateMember({id: memberId, role}, {
-            onSuccess: data => {
+            onSuccess: () => {
                 toast.success("操作成功")
             },
             onError: error => {
@@ -114,8 +114,8 @@ export default function Profile({memberId, onClose}: ProfileProps) {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent>
-                                                <DropdownMenuItem onClick={() => {
-                                                    onUpdateMember(member.role === "admin" ? "member" : "admin")
+                                                <DropdownMenuItem onClick={async () => {
+                                                    await onUpdateMember(member.role === "admin" ? "member" : "admin")
                                                 }} disabled={updatingMember}
                                                                   className="cursor-pointer capitalize hover:bg-[#f0eeeb]">
                                                     <div className="flex items-center gap-1">
