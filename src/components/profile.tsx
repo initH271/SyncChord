@@ -35,12 +35,12 @@ export default function Profile({memberId, onClose}: ProfileProps) {
         await removeMember({id: memberId}, {
             onSuccess: data => {
                 toast.success("操作成功")
+                router.replace(`${window.location.origin}/workspace/${workspaceId}`)
             },
             onError: error => {
                 toast.error("操作失败:" + error.message)
             },
         });
-        router.replace(`${window.location.origin}/workspace/${workspaceId}`)
     }
     const onLeaveMember = async () => {
         const ok = await comfirmLeave()
@@ -48,12 +48,12 @@ export default function Profile({memberId, onClose}: ProfileProps) {
         await removeMember({id: memberId}, {
             onSuccess: data => {
                 toast.success("操作成功")
+                router.replace(`${window.location.origin}`)
             },
             onError: error => {
                 toast.error("操作失败:" + error.message)
             },
         });
-        router.replace(`${window.location.origin}`)
     }
     const onUpdateMember = async (role: "admin" | "member") => {
         const ok = await comfirmUpdate()
