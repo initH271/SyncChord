@@ -11,10 +11,8 @@ import WorkspaceSidebarUserItem from "@/app/workspace/[workspaceId]/workspace-si
 import {useCreateChannelModal} from "@/features/channels/store/use-create-channel-modal";
 import {useChannelId} from "@/hooks/use-channel-id";
 import {useMemberId} from "@/hooks/use-member-id";
-import {useRouter} from "next/navigation";
 
 export default function WorkSpaceSidebar() {
-    const router = useRouter()
     const workspaceId = useWorkspaceId()
     const channelId = useChannelId()
     const {data: currentMember, isLoading: memberLoading} = useCurrentMember({workspaceId})
@@ -23,7 +21,7 @@ export default function WorkSpaceSidebar() {
     const {data: members, isLoading: membersLoading} = useGetMembers({workspaceId})
     const toMemberId = useMemberId()
     const [_open, setOpen] = useCreateChannelModal()
-    if (workspaceLoading || memberLoading) {
+    if (workspaceLoading || memberLoading || channelsLoading || membersLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-full">
                 <Loader2 className="size-10 animate-spin"/>
