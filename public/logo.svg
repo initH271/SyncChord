@@ -22,7 +22,7 @@
             </g>
         </g>
         <g transform="translate(67,14.28840160369873)">
-            <g fill-rule="" class="tp-name iconsvg-namesvg" opacity="1"
+            <g class="tp-name iconsvg-namesvg" opacity="1"
                transform="matrix(1,0,0,1,0,0)">
                 <g transform="scale(1)">
                     <g>
@@ -33,5 +33,5 @@
             </g> <!---->
         </g>
     </g>
-    <defs></defs>
+    <defs/>
 </svg>

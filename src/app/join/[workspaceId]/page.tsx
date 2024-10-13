@@ -81,7 +81,7 @@ export default function JoinPage() {
                     }} variant={"default"}>
                         返回主页
                     </Button>
-                    <Button disabled={code?.length !== 8} onClick={handleJoin} variant={"default"}>
+                    <Button disabled={code?.length !== 8 || isPending} onClick={handleJoin} variant={"default"}>
                         加入
                     </Button>
                 </div>
