@@ -1,7 +1,7 @@
 import {useCurrentMember} from "@/features/members/api/use-current-member"
 import {useGetWorkspace} from "@/features/workspaces/api/use-get-workspace"
 import {useWorkspaceId} from "@/hooks/use-workspace-id"
-import {HashIcon, Loader2, MessageSquareText, SendHorizontal, TriangleAlert} from "lucide-react"
+import {HashIcon, Loader2, TriangleAlert} from "lucide-react"
 import WorkSpaceSidebarHeader from "./workspace-sidebar-header"
 import WorkspaceSidebarItem from "@/app/workspace/[workspaceId]/workspace-sidebar-item";
 import {useGetChannels} from "@/features/channels/api/use-get-channels";
@@ -46,12 +46,6 @@ export default function WorkSpaceSidebar() {
     return (
         <div className="flex flex-col h-full">
             <WorkSpaceSidebarHeader workspace={workspace} isAdmin={currentMember.role == "admin"}/>
-            <div className="flex flex-col px-2 mt-3 gap-y-2  items-start justify-start">
-                <WorkspaceSidebarItem key={"allThreads"} label={"帖子"} id={"threads"} icon={MessageSquareText}
-                                      variant={"active"}/>
-                <WorkspaceSidebarItem key={"allDrafts"} label={"发送/草稿"} id={"drafts"} icon={SendHorizontal}
-                                      variant={"default"}/>
-            </div>
             <WorkspaceSidebarSection key={"allChannels"} label={"所有频道"} hint={"新建频道"}
                                      onNew={currentMember.role === "admin" ? () => {setOpen(true)} : undefined}>
                 {
@@ -61,7 +55,7 @@ export default function WorkSpaceSidebar() {
                     ))
                 }
             </WorkspaceSidebarSection>
-            <WorkspaceSidebarSection key={"allMembers"} label={"所有成员"} hint={"添加成员"} onNew={() => {}}>
+            <WorkspaceSidebarSection key={"allMembers"} label={"所有成员"} hint={"添加成员"}>
                 {
                     members?.map((member) => (
                         <WorkspaceSidebarUserItem key={member._id} id={member._id} user={member.user}

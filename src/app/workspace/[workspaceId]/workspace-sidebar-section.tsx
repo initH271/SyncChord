@@ -26,6 +26,7 @@ export default function WorkspaceSidebarSection({
                     <FaCaretDown className={cn("size-4 transition-transform", channelOn || "-rotate-90")}/>
                 </Button>
                 <Button variant={"stone"} size={"sm"}
+                        onClick={toggle}
                         className={"flex-1 group px-1.5 text-sm justify-start overflow-hidden"}>
                     <span className={"truncate"}>{label}</span>
                 </Button>

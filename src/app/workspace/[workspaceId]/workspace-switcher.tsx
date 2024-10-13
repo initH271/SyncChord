@@ -25,7 +25,7 @@ export const WorkspaceSwitcher = () => {
             <DropdownMenuTrigger>
                 {workspaceLoading ? <Loader className="h-10 animate-spin text-muted-foreground"/>
                     : <div
-                        className="size-10 rounded-sm relative flex justify-center items-center overflow-hidden  font-semibold text-xl bg-[#bfbaaf] text-black px-4 border-[1px] hover:bg-[#b4965813]">
+                        className="size-10 rounded-sm relative flex justify-center items-center overflow-hidden  font-semibold text-xl bg-[#6e9bc5] text-black px-4 border-[1px] hover:bg-[#6f94cd]">
                         {workspace?.name.charAt(0).toUpperCase()}
                     </div>}
             </DropdownMenuTrigger>
