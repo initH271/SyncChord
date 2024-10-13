@@ -173,12 +173,17 @@ export const remove = mutation({
         const member = await getNotDeletedMember(ctx, userId, args.id);
         if (!member || member.role !== "admin") throw new Error("未授权行为");
         // 物理删除 成员, 再删除空间
-        const [members] = await Promise.all([
-            ctx.db.query("members").withIndex("by_workspace_id", (q) => q.eq("workspaceId", args.id)).collect(),
+        const [members, channels, reactions, conversations, messages] = await Promise.all([
+            ctx.db.query("members").withIndex("by_workspace_id", q => q.eq("workspaceId", args.id)).collect(),
+            ctx.db.query("channels").withIndex("by_workspace_id", q => q.eq("workspaceId", args.id)).collect(),
+            ctx.db.query("reactions").withIndex("by_workspace_id", q => q.eq("workspaceId", args.id)).collect(),
+            ctx.db.query("conversations").withIndex("by_workspace_id", q => q.eq("workspaceId", args.id)).collect(),
+            ctx.db.query("messages").withIndex("by_workspace_id", q => q.eq("workspaceId", args.id)).collect(),
         ])
-        for (const m of members) {
+        for (const m of [...members, ...channels, ...reactions, ...conversations, ...messages]) {
             await ctx.db.delete(m._id)
         }
+
         await ctx.db.delete(args.id)
         return args.id
     },
