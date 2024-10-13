@@ -46,8 +46,8 @@ export default function JoinPage() {
         )
     }
     return (
-        <div className={"h-full w-full flex flex-col items-center justify-center shadow-sm p-8 gap-y-2 bg-[#fdfcfa]"}>
-            <Image src={"/logo.svg"} height={120} width={120} alt={"joinLogo"}/>
+        <div className={"h-full w-full flex flex-col items-center justify-center shadow-sm p-8 gap-y-1 bg-[#fdfcfa]"}>
+            <Image src={"/logo.svg"} height={204} width={150} alt={"joinLogo"}/>
             <div className={"flex flex-col items-center justify-center gap-y-4 max-w-screen-lg"}>
                 <div className={"flex flex-col items-center justify-center gap-y-2"}>
                     <p className={"text-2xl font-bold"}>
