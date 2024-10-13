@@ -15,12 +15,10 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-    CommandShortcut,
 } from "@/components/ui/command"
 import {MdPerson} from "react-icons/md";
 import {useGetChannels} from "@/features/channels/api/use-get-channels";
 import {useGetMembers} from "@/features/members/api/use-get-members";
-import Link from "next/link"
 import {useChannelId} from "@/hooks/use-channel-id";
 import {DialogDescription, DialogTitle} from "@/components/ui/dialog";
 
@@ -50,6 +48,15 @@ export const Toolbar = () => {
         }
     }, [data, router, isLoading])
 
+    const onChannelClick = (channelId: string) => {
+        setOpenCommand(false)
+        router.push(`/workspace/${workspaceId}/channel/${channelId}`)
+    }
+    const onMemberClick = (memberId: string) => {
+        setOpenCommand(false)
+        router.push(`/workspace/${workspaceId}/channel/${channelId}?profileMemberId=${memberId}`)
+    }
+
     if (isLoading || loadingCurrentMember || loadingMembers || loadingChannels) {
         return (
             <div
@@ -70,20 +77,22 @@ export const Toolbar = () => {
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup heading="建议">
-                        <CommandItem>
-                            <MdPerson className="mr-2 h-4 w-4"/>
-                            <span>Profile</span>
-                            <CommandShortcut>⌘P</CommandShortcut>
+                        <CommandItem asChild>
+                            <Button variant={"link"} onClick={() => onMemberClick(currentMember!._id)}
+                                    className={"flex w-full justify-start"}>
+                                <MdPerson className="mr-2 h-4 w-4"/>
+                                <span>Profile</span>
+                            </Button>
                         </CommandItem>
                     </CommandGroup>
                     <CommandGroup heading="频道">
                         {channels?.map((channel) => (
                             <CommandItem
                                 key={channel._id} asChild>
-                                <Link onClick={() => setOpenCommand(false)}
-                                      href={`/workspace/${workspaceId}/channel/${channel._id}`}>
+                                <Button variant={"link"} className={"flex w-full justify-start"}
+                                        onClick={() => onChannelClick(channel._id)}>
                                     <span># {channel.name}</span>
-                                </Link>
+                                </Button>
                             </CommandItem>
                         ))}
                     </CommandGroup>
@@ -91,13 +100,12 @@ export const Toolbar = () => {
                         {members?.map((member) => (
                             <CommandItem
                                 key={member._id} asChild>
-                                <Link
-                                    className={"flex"}
-                                    onClick={() => setOpenCommand(false)}
-                                    href={`/workspace/${workspaceId}/channel/${channelId}?profileMemberId=${member._id}`}>
+                                <Button variant={"link"}
+                                        className={"flex w-full justify-start"}
+                                        onClick={() => onMemberClick(member._id)}>
                                     <MdPerson className="mr-2 h-4 w-4"/>
                                     <span>{member.user.name}</span>
-                                </Link>
+                                </Button>
                             </CommandItem>
                         ))}
                     </CommandGroup>
