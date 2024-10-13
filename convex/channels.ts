@@ -83,7 +83,12 @@ export const remove = mutation({
         if (!userId) throw new Error("未授权行为.");
         const member = await getNotDeletedMember(ctx, userId, workspaceId);
         if (!member || "admin" !== member.role) throw new Error("未授权行为.");
-        // todo: 先移除channel关联的message
+        const [messages] = await Promise.all([
+            ctx.db.query("messages").withIndex("by_channel_id", q => q.eq("channelId", channelId)).collect(),
+        ])
+        for (const m of messages) {
+            await ctx.db.delete(m._id)
+        }
         await ctx.db.delete(channelId)
         return channelId
     }

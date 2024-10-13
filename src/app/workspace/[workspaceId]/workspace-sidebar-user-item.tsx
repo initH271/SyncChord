@@ -32,7 +32,6 @@ const WorkspaceSidebarUserItem = ({user, variant, id}: WorkspaceSidebarUserItemP
     const workspaceId = useWorkspaceId()
     const avatarFallback = user.name?.charAt(0).toUpperCase()
     const {data: currentMember} = useCurrentMember({workspaceId})
-    // TODO: 当前用户的特别处理, 置顶显示 or 点击跳转到个人资料页
     return (
         <Button className={cn(userItemVariants({variant}))} variant={"stone"} asChild>
             <Link href={`/workspace/${workspaceId}/member/${id}`}>
