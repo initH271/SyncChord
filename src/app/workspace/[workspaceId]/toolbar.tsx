@@ -22,6 +22,7 @@ import {useGetChannels} from "@/features/channels/api/use-get-channels";
 import {useGetMembers} from "@/features/members/api/use-get-members";
 import Link from "next/link"
 import {useChannelId} from "@/hooks/use-channel-id";
+import {DialogDescription, DialogTitle} from "@/components/ui/dialog";
 
 export const Toolbar = () => {
     const router = useRouter()
@@ -63,6 +64,8 @@ export const Toolbar = () => {
     return (
         <>
             <CommandDialog open={openCommand} onOpenChange={setOpenCommand}>
+                <DialogTitle/>
+                <DialogDescription/>
                 <CommandInput placeholder="输入命令或者搜索...."/>
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
