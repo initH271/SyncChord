@@ -158,6 +158,7 @@ export const signInAuth0 = mutation({
             })
             return {
                 refreshToken: refreshTokenId + "|" + sessionId,
+                token: existed.userId + "|" + sessionId
             }
         }
 
@@ -174,6 +175,7 @@ export const signInAuth0 = mutation({
                 })
                 return {
                     refreshToken: exitedToken._id + "|" + existedSession._id,
+                    token: existed.userId + "|" + existedSession._id
                 }
             }
         }
@@ -186,6 +188,7 @@ export const signInAuth0 = mutation({
         }
         return {
             refreshToken: exitedToken._id + "|" + existedSession._id,
+            token: existed.userId + "|" + existedSession._id
         }
 
 
