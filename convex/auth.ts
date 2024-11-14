@@ -26,6 +26,47 @@ export const {auth, signIn, signOut, store} = convexAuth({
     providers: [GitHub, Google, CustomPassword],
 });
 
+
+// API: 把store的部分能力暴露出来
+export const auth0RefreshSession = mutation({
+    args: {
+        type: v.literal("refreshSession"),
+        refreshToken: v.string(),
+
+    },
+    handler: async (ctx, args) => {
+        return store(ctx, {
+            args
+        })
+    }
+})
+
+// API: 获取用户信息, token暂时为userId | sessionId
+export const auth0RetrieveUserInfo = mutation({
+    args: {
+        type: v.literal("retrieveAccountWithCredentials"),
+        token: v.string(),
+    },
+    handler: async (ctx, {token}) => {
+        // 此处解码token, 获取用户信息, token为jwt字符串, 使用jwt库进行处理
+        const [userIdStr, sessionIdStr] = token.split("|")
+        const [userId, sessionId] = [userIdStr as Id<"users">, sessionIdStr as Id<"authSessions">]
+        if (!userId || !sessionId) return null
+
+        const user = await ctx.db.get(userId)
+        if (!user) return null;
+        const session = await ctx.db.query("authSessions")
+            .withIndex("userId", q => q.eq("userId", userId))
+            .filter(q => q.eq(q.field("_id"), sessionId))
+            .unique()
+        if (!session) return null
+        if (!!(session && isBefore(Date.now(), new Date(session.expirationTime))))
+            return user
+        return null
+    }
+})
+
+
 // API: 查看session是否有效, token = userId | sessionId
 // Return: true | false
 export const validateSession = query({
