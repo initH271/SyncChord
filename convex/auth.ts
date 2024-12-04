@@ -110,6 +110,17 @@ export const signOutAuth0 = mutation({
     }
 })
 
+export const signInAuth0Test = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const identifier = await ctx.auth.getUserIdentity();
+
+        return {
+            identifier
+        }
+    }
+})
+
 // API: 添加account
 export const signInAuth0 = mutation({
     args: {
