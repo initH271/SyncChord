@@ -6,9 +6,10 @@ import {Password} from "@convex-dev/auth/providers/Password"
 
 // 自定义附加字段 https://labs.convex.dev/auth/config/passwords#customize-user-information
 import {DataModel, Id} from "./_generated/dataModel";
-import {mutation, query} from "./_generated/server";
+import {mutation} from "./_generated/server";
 import {v} from "convex/values";
 import {addHours, addMonths, isBefore} from "date-fns";
+import {Auth0Identity, currentAuth0} from "./common";
 
 const CustomPassword = Password<DataModel>({
     profile(params) {
@@ -21,25 +22,11 @@ const CustomPassword = Password<DataModel>({
 });
 
 
-export const {auth, signIn, signOut, store} = convexAuth({
+export const {auth, signIn} = convexAuth({
     // providers: [GitHub, Google, Password],
     providers: [GitHub, Google, CustomPassword],
 });
 
-
-// API: 把store的部分能力暴露出来
-export const auth0RefreshSession = mutation({
-    args: {
-        type: v.literal("refreshSession"),
-        refreshToken: v.string(),
-
-    },
-    handler: async (ctx, args) => {
-        return store(ctx, {
-            args
-        })
-    }
-})
 
 // API: 获取用户信息, token暂时为userId | sessionId
 export const auth0RetrieveUserInfo = mutation({
@@ -66,39 +53,14 @@ export const auth0RetrieveUserInfo = mutation({
     }
 })
 
-
-// API: 查看session是否有效, token = userId | sessionId
-// Return: true | false
-export const validateSession = query({
-    args: {
-        token: v.string()
-    },
-    handler: async (ctx, {token}) => {
-        const [userIdStr, sessionIdStr] = token.split("|")
-        const [userId, sessionId] = [userIdStr as Id<"users">, sessionIdStr as Id<"authSessions">]
-        const user = await ctx.db.get(userId)
-        if (!user) return false;
-        const session = await ctx.db.query("authSessions")
-            .withIndex("userId", q => q.eq("userId", userId))
-            .filter(q => q.eq(q.field("_id"), sessionId))
-            .unique()
-        return !!(session && isBefore(Date.now(), new Date(session.expirationTime))); // session过期则失效
-    }
-})
-
-// API: 退出登录, token = token = userId | sessionId
+// API: 退出登录
 export const signOutAuth0 = mutation({
-    args: {
-        token: v.string()
-    },
-    handler: async (ctx, {token}) => {
-        const [userIdStr, sessionIdStr] = token.split("|")
-        const [userId, sessionId] = [userIdStr as Id<"users">, sessionIdStr as Id<"authSessions">]
-        const user = await ctx.db.get(userId)
-        if (!user) return false;
+    args: {},
+    handler: async (ctx,) => {
+        const {userEx}: Auth0Identity = await currentAuth0(ctx)
+        if (!userEx) return false
         const session = await ctx.db.query("authSessions")
-            .withIndex("userId", q => q.eq("userId", userId))
-            .filter(q => q.eq(q.field("_id"), sessionId))
+            .withIndex("userId", q => q.eq("userId", userEx.userId))
             .unique()
         if (!session) return false
         const refreshToken = await ctx.db.query("authRefreshTokens")
@@ -109,58 +71,52 @@ export const signOutAuth0 = mutation({
         return true
     }
 })
-
-export const signInAuth0Test = mutation({
+/*
+* {
+    "issuer": "https://dev-lo7asc24b6fp5jb3.us.auth0.com/",
+    "name": "阿凯ak",
+    "nickname": "ak-ing",
+    "pictureUrl": "https://avatars.githubusercontent.com/u/65901383?v=4",
+    "sid": "Ie8HpJXwKAm09ZCXQR4UmyqsWFWSHY8M",
+    "subject": "github|65901383",
+    "tokenIdentifier": "https://dev-lo7asc24b6fp5jb3.us.auth0.com/|github|65901383",
+    "updatedAt": "2024-12-19T11:32:53.232+00:00"
+}
+* */
+export const signInAuth0 = mutation({
     args: {},
     handler: async (ctx) => {
-        const identifier = await ctx.auth.getUserIdentity();
-
-        return {
-            identifier
-        }
-    }
-})
-
-// API: 添加account
-export const signInAuth0 = mutation({
-    args: {
-        provider: v.string(),
-        providerAccountId: v.string(),
-        params: v.object({
-            email: v.string(),
-            name: v.string(),
-            image: v.string(),
-        })
-    },
-    handler: async (ctx, {provider, providerAccountId, params}) => {
-        let existed = await ctx.db.query("authAccounts")
-            .withIndex("providerAndAccountId", q => q.eq("provider", provider).eq("providerAccountId", providerAccountId))
-            .unique()
-        if (!existed) {
-            // 注册用户
+        const {userEx, nickname, pictureUrl, subject}: Auth0Identity = await currentAuth0(ctx)
+        let user = userEx
+        if (!user) {
+            // 用户不存在，注册用户
             const newUserId = await ctx.db.insert("users", {
-                name: params.name,
-                email: params.email,
-                image: params.image
+                name: nickname,
+                image: pictureUrl
             })
+            const [provider, providerAccountId] = subject?.split("|")
+            // 注册账户
             const accountId = await ctx.db.insert("authAccounts", {
                 provider,
                 providerAccountId,
                 userId: newUserId
             })
-            existed = await ctx.db.get(accountId)
+            const existed = await ctx.db.get(accountId)
             if (!existed) {
                 await ctx.db.delete(accountId)
                 await ctx.db.delete(newUserId)
                 throw new Error("发生错误,请重试");
             }
+            user = await ctx.db.get(newUserId)
         }
+
+        // 用户已存在，更新登录状态
         const existedSession = await ctx.db.query("authSessions")
-            .withIndex("userId", q => q.eq("userId", existed.userId))
+            .withIndex("userId", q => q.eq("userId", user.userId))
             .first()
         if (!existedSession) {
             const sessionId = await ctx.db.insert("authSessions", {
-                userId: existed.userId,
+                userId: user.userId,
                 expirationTime: addMonths(Date.now(), 1).getTime(), // 会话有效期一个月
             })
             const refreshTokenId = await ctx.db.insert("authRefreshTokens", {
@@ -169,7 +125,7 @@ export const signInAuth0 = mutation({
             })
             return {
                 refreshToken: refreshTokenId + "|" + sessionId,
-                token: existed.userId + "|" + sessionId
+                token: user.userId + "|" + sessionId
             }
         }
 
@@ -186,7 +142,7 @@ export const signInAuth0 = mutation({
                 })
                 return {
                     refreshToken: exitedToken._id + "|" + existedSession._id,
-                    token: existed.userId + "|" + existedSession._id
+                    token: user.userId + "|" + existedSession._id
                 }
             }
         }
@@ -199,9 +155,8 @@ export const signInAuth0 = mutation({
         }
         return {
             refreshToken: exitedToken._id + "|" + existedSession._id,
-            token: existed.userId + "|" + existedSession._id
+            token: user.userId + "|" + existedSession._id
         }
-
 
     }
 })
