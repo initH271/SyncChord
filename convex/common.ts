@@ -28,7 +28,9 @@ export const currentAuth0 = async (ctx: QueryCtx) => {
                 q.eq("provider", provider).eq("providerAccountId", providerAccountId))
         .unique()
     if (!accountEx) {
-        return null
+        return {
+            ...identity
+        }
     }
     const userId = accountEx.userId
     const userEx = await ctx.db.get(userId)

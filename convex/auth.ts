@@ -116,7 +116,7 @@ export const signInAuth0 = mutation({
             .first()
         if (!existedSession) {
             const sessionId = await ctx.db.insert("authSessions", {
-                userId: user.userId,
+                userId: user._id,
                 expirationTime: addMonths(Date.now(), 1).getTime(), // 会话有效期一个月
             })
             const refreshTokenId = await ctx.db.insert("authRefreshTokens", {
@@ -125,9 +125,10 @@ export const signInAuth0 = mutation({
             })
             return {
                 refreshToken: refreshTokenId + "|" + sessionId,
-                token: user.userId + "|" + sessionId
+                token: user._id + "|" + sessionId
             }
         }
+
 
         if (isBefore(new Date(existedSession.expirationTime), Date.now())) { // session过期
             const exitedToken = await ctx.db.query("authRefreshTokens")
@@ -135,6 +136,7 @@ export const signInAuth0 = mutation({
                 .first()
             if (exitedToken && isBefore(Date.now(), new Date(exitedToken.expirationTime))) { // token没过期
                 await ctx.db.patch(existedSession._id, {
+                    userId: user._id,
                     expirationTime: addMonths(new Date(existedSession.expirationTime), 1).getTime(), // 续上一个月
                 })
                 await ctx.db.patch(exitedToken._id, {
@@ -142,7 +144,7 @@ export const signInAuth0 = mutation({
                 })
                 return {
                     refreshToken: exitedToken._id + "|" + existedSession._id,
-                    token: user.userId + "|" + existedSession._id
+                    token: user._id + "|" + existedSession._id
                 }
             }
         }
@@ -155,7 +157,7 @@ export const signInAuth0 = mutation({
         }
         return {
             refreshToken: exitedToken._id + "|" + existedSession._id,
-            token: user.userId + "|" + existedSession._id
+            token: user._id + "|" + existedSession._id
         }
 
     }
