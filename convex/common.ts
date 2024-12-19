@@ -1,12 +1,6 @@
 import {QueryCtx} from "./_generated/server";
 import {Id} from "./_generated/dataModel";
-import {UserIdentity} from "convex/server";
 
-
-export type Auth0Identity = UserIdentity & {
-    userEx: any
-    accountEx: any
-}
 
 // 获取当前登录用户，使用auth0
 /**

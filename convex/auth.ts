@@ -9,7 +9,7 @@ import {DataModel, Id} from "./_generated/dataModel";
 import {mutation} from "./_generated/server";
 import {v} from "convex/values";
 import {addHours, addMonths, isBefore} from "date-fns";
-import {Auth0Identity, currentAuth0} from "./common";
+import {currentAuth0} from "./common";
 
 const CustomPassword = Password<DataModel>({
     profile(params) {
@@ -57,7 +57,7 @@ export const auth0RetrieveUserInfo = mutation({
 export const signOutAuth0 = mutation({
     args: {},
     handler: async (ctx,) => {
-        const {userEx}: Auth0Identity = await currentAuth0(ctx)
+        const {userEx}: any = await currentAuth0(ctx)
         if (!userEx) return false
         const session = await ctx.db.query("authSessions")
             .withIndex("userId", q => q.eq("userId", userEx.userId))
@@ -86,7 +86,7 @@ export const signOutAuth0 = mutation({
 export const signInAuth0 = mutation({
     args: {},
     handler: async (ctx) => {
-        const {userEx, nickname, pictureUrl, subject}: Auth0Identity = await currentAuth0(ctx)
+        const {userEx, nickname, pictureUrl, subject}: any = await currentAuth0(ctx)
         let user = userEx
         if (!user) {
             // 用户不存在，注册用户
