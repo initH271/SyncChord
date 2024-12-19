@@ -41,6 +41,11 @@ export const currentAuth0 = async (ctx: QueryCtx) => {
     }
 }
 
+export const getAuth0UserId = async (ctx: QueryCtx) => {
+    const auth0: any = await currentAuth0(ctx)
+    return auth0?.userEx?._id
+}
+
 
 // 获取用户所在当前workspace的member身份信息
 export const getNotDeletedMember = (ctx: QueryCtx, userId: Id<"users">, workspaceId: Id<"workspaces">) => {

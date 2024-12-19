@@ -1,7 +1,7 @@
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {mutation, query} from "./_generated/server";
 import {v} from "convex/values";
-import {getMember, getNotDeletedMember} from "./common";
+import {getAuth0UserId, getMember, getNotDeletedMember} from "./common";
 
 // API: 获取用户所有workspace
 export const get = query({
@@ -111,6 +111,35 @@ export const newJoinCode = mutation({
             joinCode: newCode
         })
         return args.workspaceId
+    }
+})
+
+// API: 创建workspace
+export const createA = mutation({
+    args: {
+        name: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const userId = await getAuth0UserId(ctx)
+        if (!userId) throw new Error("未授权行为.");
+
+        const joinCode = generateJoinCode()
+        const wsId = await ctx.db.insert("workspaces", {
+            name: args.name,
+            userId,
+            joinCode
+        })
+        await ctx.db.insert("channels", {
+            name: "general",
+            workspaceId: wsId,
+        })
+        await ctx.db.insert("members", {
+            userId,
+            workspaceId: wsId,
+            role: "admin"
+        })
+
+        return wsId
     }
 })
 
